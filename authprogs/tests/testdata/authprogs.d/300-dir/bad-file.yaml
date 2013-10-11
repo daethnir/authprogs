@@ -1,0 +1,9 @@
+# This is an invalid yaml file, to verify that we don't
+# read dotfiles.
+
+foo: bar
+     baz
+
+bar quux
+-
+- succatash

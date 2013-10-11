@@ -1,0 +1,5 @@
+# This file, by virtue of being a dotfile, should never be read.
+
+    allow: 
+        - command: DOTFILE
+

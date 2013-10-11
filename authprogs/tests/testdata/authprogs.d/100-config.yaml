@@ -1,0 +1,3 @@
+    allow: 
+        - command: 100-config
+

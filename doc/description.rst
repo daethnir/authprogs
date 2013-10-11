@@ -1,10 +1,10 @@
 
 Authprogs
-=========
+---------
 
-authprogs is an SSH command authenticator. It is invoked on
+`authprogs` is an SSH command authenticator. It is invoked on
 an ssh server and decides if the command requested by the
-ssh client should be run or rejected based on logic in the authprogs
+ssh client should be run or rejected based on logic in the `authprogs`
 configuration file.
 
 Passwordless SSH using ssh identies or pubkeys can enable all
@@ -17,20 +17,11 @@ security breach. This could be catastrophic, for example if the
 access is to the root account.
 
 Authprogs is run on the SSH server and compares the requested
-command against the authprogs configuration file/files. This
-enables authprogs to make intelligent decisions based on things
+command against the `authprogs` configuration file/files. This
+enables `authprogs` to make intelligent decisions based on things
 such as the command itself, the SSH key that was used, the
 client IP, and such.
 
-authprogs is enabled by using the command= option in the
-authorized_keys file.
-
-Installation and Usage
-======================
-
-See the full authprogs man page in the doc directory.
-
-Author
-======
-Bri Hatch <bri@ifokr.org>
+`authprogs` is enabled by using the `command=` option in the
+`authorized_keys` file.
 

@@ -1,0 +1,98 @@
+-
+    # Test that we don't blow up on blank stanzas
+-
+    # Single allow command - no list
+    from: 0.0.0.0
+    allow:
+        command: SINGLE
+-
+    # List of allow commands, with only one element.
+    from: 0.0.0.1
+    allow:
+        - command: SINGLE_LIST
+-
+    from: [0.0.0.2, 1.1.1.1]
+    allow:
+        - command: MULTIPLE_ONE
+        - command: MULTIPLE_TWO
+-
+    # test_unrestricted_client_ip
+    allow:
+        command: NO_IP_RESTRICTIONS
+-
+    # test_command_with_args
+    from: 
+        - a.b.c.d
+        - 0.0.0.3
+    allow:
+        command: /bin/echo Hello     World
+-
+    from: 0.0.0.4
+    allow:
+        rule_type: command
+        command: /bin/echo Goodbye
+        allow_trailing_args: true
+-
+    from: 0.0.0.5
+    allow:
+        command: ^/bin/rm\s+(-\S+\s+)*/var/tmp/\S*$
+        pcre_match: true
+-
+    from: 0.0.0.6
+    allow:
+        rule_type: scp
+        allow_upload: true
+        allow_download: true
+-
+    from: 1.0.0.6
+    allow:
+        rule_type: scp
+-
+    from: 0.0.0.7
+    allow:
+        rule_type: scp
+        allow_upload: true
+        allow_download: true
+        allow_recursion: true
+- 
+    from: 0.0.0.8
+    allow:
+        rule_type: scp
+        allow_upload: false
+        allow_download: false
+-
+    from: 0.0.0.9
+    allow:
+        rule_type: scp
+        allow_upload: true
+        allow_download: true
+        allow_recursion: false
+        allow_permissions: false
+-
+    from: 0.0.0.10
+    allow:
+        rule_type: scp
+        allow_upload: false
+        allow_download: true
+        allow_recursion: false
+        files: [/etc/aliases, /etc/passwd]
+-
+    from: 1.0.0.10
+    allow:
+        rule_type: scp
+        allow_upload: false
+        allow_download: true
+        allow_recursion: false
+        files: 
+          - /etc/group
+          - /etc/resolv.conf
+-
+    from: 0.0.0.11
+    keynames: [foo, bar]
+    allow:
+        command: KEYTEST
+-
+    keynames: baz
+    allow:
+        command: KEYTEST2
+-
