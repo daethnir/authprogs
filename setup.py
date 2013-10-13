@@ -1,15 +1,23 @@
 #!/usr/bin/env python
 """Authprogs setup.py"""
 
+# pylint: disable-msg=W0511
+# pylint: disable-msg=R0904
+
 import authprogs
-import multiprocessing
 import os
 import shutil
 import subprocess
+import sys
 
 from setuptools import setup
-from distutils.command.install import install
-from distutils.command.sdist import sdist
+from setuptools.command.install import install
+from setuptools.command.sdist import sdist
+
+
+# Documents that should be converted or renamed from markdown
+MARKDOWN2HTML = ['authprogs']
+MARKDOWN2TEXT = ['AUTHORS', 'INSTALL', 'README', 'TODO']
 
 
 def long_description():
@@ -18,51 +26,101 @@ def long_description():
         return filed.read()
 
 
-class APInstall(install):
-    """Create man pages and share/doc files from markdown/etc source."""
+def runcmd(command, command_input=None, cwd=None):
+    """Run a command, potentially sending stdin, and capturing stdout/err."""
+    proc = subprocess.Popen(command, stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            cwd=cwd)
+    (stdout, stderr) = proc.communicate(command_input)
+    if proc.returncode != 0:
+        sys.stderr.write('ABORTING: command "%s" failed w/ code %s:\n'
+                         '%s\n%s' % (command, proc.returncode,
+                                     stdout, stderr))
+        sys.exit(proc.returncode)
+    return proc.returncode, stdout, stderr
 
-    def run(self):
+
+class Converter(object):
+    """Documentation conversion class."""
+    def __init__(self):
+        """Init."""
+        self.created = []
+
+    def dd_docs(self):
+        """Copy and convert various documentation files."""
         top = os.path.join(os.path.dirname(__file__))
-        doc = os.path.join(os.path.dirname(__file__), 'doc')
+        doc = os.path.join(top, 'doc')
+
+        # Markdown to ronn to man page
         man_md = os.path.join(doc, 'authprogs.md')
         man_ronn = os.path.join(doc, 'authprogs.1.ronn')
         man_1 = os.path.join(doc, 'authprogs.1')
 
-        # Copy and convert the ronn-formatted man page
-        shutil.copy(man_md, man_ronn)
-        print 'running ronn'
+        # Create manpage
         try:
-            retval = subprocess.call(['ronn', '-r', man_ronn])
-            print 'done ronn %s' % retval
-            if retval != 0:
-                raise Exception('ronn man page conversion failed, '
-                                'returned %s' % retval)
+            if not os.path.exists(man_1):
+                shutil.copy(man_md, man_ronn)
+                self.created.append(man_ronn)
+                retval = subprocess.call(['ronn', '-r', man_ronn])
+                if retval != 0:
+                    raise Exception('ronn man page conversion failed, '
+                                    'returned %s' % retval)
+                self.created.append(man_1)
         except:
             raise Exception('ronn required for manpage conversion - do you '
                             'have it installed?')
 
-        # Let us handle installs from source and sdist
-        readme = os.path.join(top, 'README')
-        if os.path.exists(readme):
-            install.run(self)
-        else:
-            shutil.copy(os.path.join(top, 'README.md'), readme)
-            install.run(self)
-            os.remove(readme)
+        # Markdown files in docs dir get converted to .html
+        for name in MARKDOWN2HTML:
+            htmlfile = os.path.join(doc, '%s.html' % name)
+            if os.path.exists(htmlfile):
+                continue
 
-        os.remove(man_ronn)
-        os.remove(man_1)
+            target = open(htmlfile, 'w')
+            self.created.append(htmlfile)
+            stdout = runcmd(['markdown', os.path.join(top, '%s.md' % name)])[1]
+            if not stdout:
+                raise Exception('markdown conversion failed, no output.')
+            target.write(stdout)
+            target.close()
+
+        # Markdown files in top level just get renamed sans .md
+        for name in MARKDOWN2TEXT:
+            target = os.path.join(top, name)
+            if os.path.exists(target):
+                continue
+            source = os.path.join(top, '%s.md' % target)
+            shutil.copy(source, target)
+            self.created.append(target)
+
+    def rm_docs(self):
+        """Remove converted docs."""
+        for filename in self.created:
+            if os.path.exists(filename):
+                os.unlink(filename)
+
+
+class APInstall(install):
+    """Create man pages and share/doc files from markdown/etc source."""
+
+    def run(self):
+        converter = Converter()
+
+        converter.dd_docs()
+        install.run(self)
+        converter.rm_docs()
 
 
 class APSdist(sdist):
-    """Copy README.md to README for sdist packaging."""
+    """Convert markdown for sdist packaging."""
 
     def run(self):
-        top = os.path.join(os.path.dirname(__file__))
-        shutil.copy(os.path.join(top, 'README.md'),
-                    os.path.join(top, 'README'))
+        converter = Converter()
+
+        converter.dd_docs()
         sdist.run(self)
-        os.remove(os.path.join(top, 'README'))
+        converter.rm_docs()
 
 
 setup(
@@ -81,9 +139,10 @@ setup(
     packages=['authprogs'],
     data_files=[
         ('share/man/man1/', ['doc/authprogs.1']),
-        ('share/doc/authprogs/', ['README', 'TODO.md', 'COPYING'])],
-    test_suite='nose.collector',
-    tests_require=['nose'],
+        ('share/doc/authprogs/',
+         ['AUTHORS', 'COPYING', 'INSTALL', 'README',
+          'TODO', 'doc/authprogs.html'])],
+    test_suite='authprogs.tests',
     install_requires=['pyyaml'],
     zip_safe=False,
     cmdclass={"install": APInstall, "sdist": APSdist}

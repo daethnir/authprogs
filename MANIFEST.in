@@ -1,5 +1,7 @@
-include TODO.md
-include doc/authprogs.md
-include doc/description.rst
-recursive-include test/testdata *.yaml
-prune doc/authprogs.1
+include AUTHORS
+include COPYING
+include INSTALL
+include README
+include TODO
+include doc/authprogs.1
+include doc/authprogs.html

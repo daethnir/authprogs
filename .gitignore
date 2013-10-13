@@ -20,3 +20,9 @@
 /build/
 
 MANIFEST
+
+# Converted documentation
+AUTHORS
+INSTALL
+README
+TODO
