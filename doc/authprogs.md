@@ -228,7 +228,7 @@ The general format of a rule is as follows:
 
     # Next rule begins here
     selection_option_3: value
-    ...
+    \[char46]..
 
 Some of the keys take single arguments, while others may take lists.
 See the definition of each to understand the values it accepts.

@@ -79,7 +79,7 @@ class Converter(object):
 
             target = open(htmlfile, 'w')
             self.created.append(htmlfile)
-            stdout = runcmd(['markdown', os.path.join(top, '%s.md' % name)])[1]
+            stdout = runcmd(['markdown', os.path.join(doc, '%s.md' % name)])[1]
             if not stdout:
                 raise Exception('markdown conversion failed, no output.')
             target.write(stdout)
@@ -140,7 +140,7 @@ setup(
     data_files=[
         ('share/man/man1/', ['doc/authprogs.1']),
         ('share/doc/authprogs/',
-         ['AUTHORS', 'COPYING', 'INSTALL', 'README',
+         ['AUTHORS','README',
           'TODO', 'doc/authprogs.html'])],
     test_suite='authprogs.tests',
     install_requires=['pyyaml'],

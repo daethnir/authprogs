@@ -474,7 +474,7 @@ def main():  # pylint: disable-msg=R0912,R0915
                      help='Write additional debugging information '
                      'to --logfile')
     group.add_option('--authorized_keys', dest='authorized_keys',
-                     default=os.path.join(os.environ['HOME'],
+                     default=os.path.join(os.path.expanduser('~'),
                                           '.ssh', 'authorized_keys'),
                      help='Location of authorized_keys file for '
                      '--install_key. Defaults to ~/.ssh/authorized_keys',
@@ -486,11 +486,11 @@ def main():  # pylint: disable-msg=R0912,R0915
         sys.exit('authprogs does not accept commandline arguments.')
 
     if not opts.configfile:
-        cfg = os.path.join(os.environ['HOME'], '.ssh', 'authprogs.yaml')
+        cfg = os.path.join(os.path.expanduser('~'), '.ssh', 'authprogs.yaml')
         if os.path.isfile(cfg):
             opts.configfile = cfg
     if not opts.configdir:
-        cfg = os.path.join(os.environ['HOME'], '.ssh', 'authprogs.d')
+        cfg = os.path.join(os.path.expanduser('~'), '.ssh', 'authprogs.d')
         if os.path.isdir(cfg):
             opts.configdir = cfg
 
