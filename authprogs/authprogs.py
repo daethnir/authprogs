@@ -264,12 +264,12 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         # Ignore errors; we'll fail shortly if we can't
         # create the authkeys file.
         try:
-            os.makedirs(os.path.dirname(authorized_keys), 0700)
+            os.makedirs(os.path.dirname(authorized_keys), 0o700)
         except OSError:
             pass
 
         keydata = open(keyfile).read()
-        target_fd = os.open(authorized_keys, os.O_RDWR | os.O_CREAT, 0600)
+        target_fd = os.open(authorized_keys, os.O_RDWR | os.O_CREAT, 0o600)
         self.install_key_data(keydata, os.fdopen(target_fd, 'w+'))
 
     def find_match_scp(self, rule):  # pylint: disable-msg=R0911,R0912
