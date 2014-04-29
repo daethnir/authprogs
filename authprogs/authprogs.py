@@ -422,7 +422,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             command_info['code'] = retcode
             self.log('result: %s\n' % command_info)
             sys.exit(retcode)
-        except (CommandRejected, OSError), err:
+        except (CommandRejected, OSError) as err:
             command_info['exception'] = '%s' % err
             self.log('result: %s\n' % command_info)
             sys.exit(retcode)
@@ -513,7 +513,7 @@ def main():  # pylint: disable-msg=R0912,R0915
                 ap.install_key(opts.install_key, opts.authorized_keys)
                 sys.stderr.write('Key installed successfully.\n')
                 sys.exit(0)
-            except InstallError, err:
+            except InstallError as err:
                 sys.stderr.write('Key install failed: %s' % err)
                 sys.exit(1)
 
@@ -524,17 +524,17 @@ def main():  # pylint: disable-msg=R0912,R0915
         else:
             parser.error('Not sure what to do. Consider --help')
 
-    except SSHEnvironmentError, err:
+    except SSHEnvironmentError as err:
         ap.log('SSHEnvironmentError "%s"\n%s\n' % (
                 err, traceback.format_exc()))
         sys.exit('authprogs: %s' % err)
-    except ConfigError, err:
+    except ConfigError as err:
         ap.log('ConfigError "%s"\n%s\n' % (
                 err, traceback.format_exc()))
         sys.exit('authprogs: %s' % err)
-    except CommandRejected, err:
+    except CommandRejected as err:
         sys.exit('authprogs: %s' % err)
-    except Exception, err:
+    except Exception as err:
         ap.log('Unexpected exception: %s\n%s\n' % (
                 err, traceback.format_exc()))
         sys.exit('authprogs experienced an unexpected exception.')
