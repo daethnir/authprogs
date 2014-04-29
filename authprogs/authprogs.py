@@ -234,7 +234,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
     def dump_config(self):
         """Pretty print the configuration dict to stdout."""
         self.load()
-        print 'Configuration\n%s\n' % pretty(self.yamldocs)
+        print('Configuration\n%s\n' % pretty(self.yamldocs))
 
     def install_key_data(self, keydata, target):
         """Install the key data into the open file."""
