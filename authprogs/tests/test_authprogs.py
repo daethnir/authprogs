@@ -17,7 +17,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import StringIO
+try:
+    import StringIO as io
+except ImportError:
+    import io
+
 from authprogs import authprogs
 import unittest
 import os
@@ -271,7 +275,7 @@ class AuthProgsTests(unittest.TestCase):
     def test_install_key(self):
         """Verify we can install a key into the authorized_keys file."""
 
-        thefile = StringIO.StringIO()
+        thefile = io.StringIO()
         initial_contents = 'ssh-rsa AAAA foo@example.com'
         thefile.write(initial_contents)
         thefile.write('\n')
@@ -288,7 +292,7 @@ class AuthProgsTests(unittest.TestCase):
     def test_install_key_with_logfile(self):
         """Verify we can install key with --logfile."""
 
-        thefile = StringIO.StringIO()
+        thefile = io.StringIO()
         initial_contents = 'ssh-rsa AAAA foo@example.com'
         thefile.write(initial_contents)
         thefile.write('\n')
@@ -328,7 +332,7 @@ class AuthProgsTests(unittest.TestCase):
     def test_install_key_duplicate(self):
         """Verify we don't install dups into the authorized_keys file."""
 
-        thefile = StringIO.StringIO()
+        thefile = io.StringIO()
         initial_contents = ('command="" ssh-rsa AAAABBBBCCCCDD '
                             'foo@example.com\n')
         thefile.write(initial_contents)

@@ -20,7 +20,11 @@ Used to restrict which commands can be run via trusted SSH keys."""
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import StringIO
+try:
+    import StringIO as io
+except ImportError:
+    import io
+
 import optparse
 import os
 import pprint
@@ -213,7 +217,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
                      if os.path.isfile(f) and
                      not os.path.basename(f).startswith('.')])
 
-        merged_configfile = StringIO.StringIO()
+        merged_configfile = io.StringIO()
         merged_configfile.write('-\n')
         for thefile in loadfiles:
             self.logdebug('reading in config file %s\n' % thefile)
