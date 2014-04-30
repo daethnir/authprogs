@@ -19,6 +19,10 @@ from setuptools.command.sdist import sdist
 MARKDOWN2HTML = ['authprogs']
 MARKDOWN2TEXT = ['AUTHORS', 'INSTALL', 'README', 'TODO']
 
+if sys.version_info[0] == 2:
+    console_script = 'authprogs'
+else:
+    console_script = 'authprogs%d' % sys.version_info.major
 
 def long_description():
     """Read our long description from the fs."""
@@ -135,7 +139,6 @@ setup(
     license='GPLv2',
     maintainer='Bri Hatch',
     maintainer_email='bri@ifokr.org',
-    scripts=['bin/authprogs'],
     packages=['authprogs'],
     data_files=[
         ('share/man/man1/', ['doc/authprogs.1']),
@@ -145,5 +148,8 @@ setup(
     test_suite='authprogs.tests',
     install_requires=['pyyaml'],
     zip_safe=False,
-    cmdclass={"install": APInstall, "sdist": APSdist}
+    cmdclass={"install": APInstall, "sdist": APSdist},
+    entry_points={
+        'console_scripts': ['%s = authprogs.authprogs:main' % console_script]
+    },
 )
