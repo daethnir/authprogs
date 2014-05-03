@@ -20,7 +20,11 @@ Used to restrict which commands can be run via trusted SSH keys."""
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import StringIO
+try:
+    import StringIO as io
+except ImportError:
+    import io
+
 import optparse
 import os
 import pprint
@@ -213,7 +217,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
                      if os.path.isfile(f) and
                      not os.path.basename(f).startswith('.')])
 
-        merged_configfile = StringIO.StringIO()
+        merged_configfile = io.StringIO()
         merged_configfile.write('-\n')
         for thefile in loadfiles:
             self.logdebug('reading in config file %s\n' % thefile)
@@ -234,7 +238,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
     def dump_config(self):
         """Pretty print the configuration dict to stdout."""
         self.load()
-        print 'Configuration\n%s\n' % pretty(self.yamldocs)
+        print('Configuration\n%s\n' % pretty(self.yamldocs))
 
     def install_key_data(self, keydata, target):
         """Install the key data into the open file."""
@@ -264,12 +268,12 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         # Ignore errors; we'll fail shortly if we can't
         # create the authkeys file.
         try:
-            os.makedirs(os.path.dirname(authorized_keys), 0700)
+            os.makedirs(os.path.dirname(authorized_keys), 0o700)
         except OSError:
             pass
 
         keydata = open(keyfile).read()
-        target_fd = os.open(authorized_keys, os.O_RDWR | os.O_CREAT, 0600)
+        target_fd = os.open(authorized_keys, os.O_RDWR | os.O_CREAT, 0o600)
         self.install_key_data(keydata, os.fdopen(target_fd, 'w+'))
 
     def find_match_scp(self, rule):  # pylint: disable-msg=R0911,R0912
@@ -422,7 +426,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             command_info['code'] = retcode
             self.log('result: %s\n' % command_info)
             sys.exit(retcode)
-        except (CommandRejected, OSError), err:
+        except (CommandRejected, OSError) as err:
             command_info['exception'] = '%s' % err
             self.log('result: %s\n' % command_info)
             sys.exit(retcode)
@@ -513,7 +517,7 @@ def main():  # pylint: disable-msg=R0912,R0915
                 ap.install_key(opts.install_key, opts.authorized_keys)
                 sys.stderr.write('Key installed successfully.\n')
                 sys.exit(0)
-            except InstallError, err:
+            except InstallError as err:
                 sys.stderr.write('Key install failed: %s' % err)
                 sys.exit(1)
 
@@ -524,17 +528,17 @@ def main():  # pylint: disable-msg=R0912,R0915
         else:
             parser.error('Not sure what to do. Consider --help')
 
-    except SSHEnvironmentError, err:
+    except SSHEnvironmentError as err:
         ap.log('SSHEnvironmentError "%s"\n%s\n' % (
                 err, traceback.format_exc()))
         sys.exit('authprogs: %s' % err)
-    except ConfigError, err:
+    except ConfigError as err:
         ap.log('ConfigError "%s"\n%s\n' % (
                 err, traceback.format_exc()))
         sys.exit('authprogs: %s' % err)
-    except CommandRejected, err:
+    except CommandRejected as err:
         sys.exit('authprogs: %s' % err)
-    except Exception, err:
+    except Exception as err:
         ap.log('Unexpected exception: %s\n%s\n' % (
                 err, traceback.format_exc()))
         sys.exit('authprogs experienced an unexpected exception.')
