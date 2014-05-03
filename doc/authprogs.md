@@ -73,7 +73,8 @@ command="" section if you wish.
 See the sshd(8) man page for more information about allowed
 `authorized_keys` configuration options.
 
-AUTOMATED KEY INSTALLATION
+## AUTOMATED KEY INSTALLATION
+
 Authprogs is capable of adding your key to your `authorized_keys`
 file (`~/.ssh/authorized_keys` by default) programatically. It
 also disableds ssh port forwarding by default for this key (a
