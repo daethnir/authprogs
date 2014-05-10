@@ -188,7 +188,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         client_ip = self.get_client_ip()
 
         if client_ip in allow_from:
-            self.logdebug('client_ip %s in %s' % (client_ip, allow_from))
+            self.logdebug('client_ip %s in %s\n' % (client_ip, allow_from))
             return True
         else:
             self.logdebug('client_ip %s not in %s' % (client_ip, allow_from))
