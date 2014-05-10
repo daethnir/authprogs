@@ -497,6 +497,7 @@ def main():  # pylint: disable-msg=R0912,R0915
     if opts.debug and not opts.logfile:
         parser.error('--debug requires use of --logfile')
 
+    ap = None
     try:
         ap = AuthProgs(logfile=opts.logfile,  # pylint: disable-msg=C0103
                        configfile=opts.configfile,
@@ -535,8 +536,12 @@ def main():  # pylint: disable-msg=R0912,R0915
     except CommandRejected, err:
         sys.exit('authprogs: %s' % err)
     except Exception, err:
-        ap.log('Unexpected exception: %s\n%s\n' % (
-                err, traceback.format_exc()))
+        if ap:
+            ap.log('Unexpected exception: %s\n%s\n' % (
+                    err, traceback.format_exc()))
+        else:
+            sys.stderr.write('Unexpected exception: %s\n%s\n' % (
+                    err, traceback.format_exc()))
         sys.exit('authprogs experienced an unexpected exception.')
 
 
