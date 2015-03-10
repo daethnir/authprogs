@@ -422,8 +422,16 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             self.logdebug('find_match returned "%s"\n' % match)
 
             command = match['command']
-            retcode = subprocess.call(command)
+            output = subprocess.check_output(command)
+            command_info['output'] = output
+            sys.stdout.write(output)
+            retcode = 0
             command_info['code'] = retcode
+            self.log('result: %s\n' % command_info)
+            sys.exit(retcode)
+        except CalledProcessError as err:
+            retcode = err.returncode
+            command_info['exception'] = '%s' % err
             self.log('result: %s\n' % command_info)
             sys.exit(retcode)
         except (CommandRejected, OSError) as err:
