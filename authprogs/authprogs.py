@@ -7,7 +7,6 @@ Used to restrict which commands can be run via trusted SSH keys."""
 #    This file is part of authprogs.
 #
 #    Authprogs is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
 #    it under the terms of the GNU General Public License v2 as published by
 #    the Free Software Foundation.
 #
@@ -478,8 +477,7 @@ def main():  # pylint: disable-msg=R0912,R0915
                      help='Write additional debugging information '
                      'to --logfile')
     group.add_option('--authorized_keys', dest='authorized_keys',
-                     default=os.path.join(os.environ['HOME'],
-                                          '.ssh', 'authorized_keys'),
+                     default=os.path.expanduser('~/.ssh/authorized_keys'),
                      help='Location of authorized_keys file for '
                      '--install_key. Defaults to ~/.ssh/authorized_keys',
                      metavar='FILE')
@@ -490,11 +488,11 @@ def main():  # pylint: disable-msg=R0912,R0915
         sys.exit('authprogs does not accept commandline arguments.')
 
     if not opts.configfile:
-        cfg = os.path.join(os.environ['HOME'], '.ssh', 'authprogs.yaml')
+        cfg = os.path.expanduser('~/.ssh/authprogs.yaml')
         if os.path.isfile(cfg):
             opts.configfile = cfg
     if not opts.configdir:
-        cfg = os.path.join(os.environ['HOME'], '.ssh', 'authprogs.d')
+        cfg = os.path.expanduser('~/.ssh/authprogs.d')
         if os.path.isdir(cfg):
             opts.configdir = cfg
 
