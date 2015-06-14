@@ -25,6 +25,8 @@ file we require ronn, which can be found at [ronn]
 Or it may be available in your distro already, for example
 
         $ sudo apt-get install ronn
+   or
+        $ sudo apt-get install ruby-ronn
 
 There should be no other dependencies.
 
