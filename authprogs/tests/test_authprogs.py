@@ -137,7 +137,7 @@ class AuthProgsTests(unittest.TestCase):
         """Verify we reject keynames with spaces."""
 
         # No error raised
-        dummy_ap = authprogs.AuthProgs(keyname='foobar')
+        _ = authprogs.AuthProgs(keyname='foobar')
 
         # Spaces triggers SSHEnvironmentError
         self.assertRaises(authprogs.Error,

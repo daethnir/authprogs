@@ -107,10 +107,10 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             self.authprogs_binary = kwargs['authprogs_binary']
         else:
             self.authprogs_binary = (
-                    os.path.abspath(os.path.abspath(sys.argv[0])))
+                os.path.abspath(os.path.abspath(sys.argv[0])))
 
         self.original_command_string = os.environ.get(
-                'SSH_ORIGINAL_COMMAND', '')
+            'SSH_ORIGINAL_COMMAND', '')
 
         self.original_command_list = self.original_command_string.split()
 
@@ -210,11 +210,11 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         if self.configdir:
             # Gets list of all non-dotfile files from configdir.
             loadfiles.extend(
-                    [f for f in
-                     [os.path.join(self.configdir, x) for x in
-                      os.listdir(self.configdir)]
-                     if os.path.isfile(f) and
-                     not os.path.basename(f).startswith('.')])
+                [f for f in
+                 [os.path.join(self.configdir, x) for x in
+                  os.listdir(self.configdir)]
+                 if os.path.isfile(f) and
+                 not os.path.basename(f).startswith('.')])
 
         merged_configfile = io.StringIO()
         merged_configfile.write('-\n')
@@ -442,33 +442,40 @@ def main():  # pylint: disable-msg=R0912,R0915
     Used to restrict which commands can be run via trusted SSH keys.
     """)
 
-    group = optparse.OptionGroup(parser, 'Run Mode Options',
-            'These options determine in which mode the authprogs '
-            'program runs.')
-    group.add_option('-r', '--run', dest='run', action='store_true',
-                      help='Act as ssh command authenticator. Use this '
-                      'when calling from authorized_keys.')
-    group.add_option('--dump_config', dest='dump_config',
-                     action='store_true',
-                     help='Dump configuration (python format) '
-                     'to standand out and exit.')
-    group.add_option('--install_key', dest='install_key',
-                      help='Install the named ssh public key file to '
-                      'authorized_keys.', metavar='FILE')
+    group = optparse.OptionGroup(
+        parser, 'Run Mode Options',
+        'These options determine in which mode the authprogs '
+        'program runs.')
+    group.add_option(
+        '-r', '--run', dest='run', action='store_true',
+        help='Act as ssh command authenticator. Use this '
+        'when calling from authorized_keys.')
+    group.add_option(
+        '--dump_config', dest='dump_config',
+        action='store_true',
+        help='Dump configuration (python format) '
+        'to standand out and exit.')
+    group.add_option(
+        '--install_key', dest='install_key',
+        help='Install the named ssh public key file to '
+        'authorized_keys.', metavar='FILE')
     parser.add_option_group(group)
 
     group = optparse.OptionGroup(parser, 'Other Options')
-    group.add_option('--keyname', dest='keyname',
-                     help='Name for this key, used when matching '
-                     'config blocks.')
-    group.add_option('--configfile', dest='configfile',
-                     help='Path to authprogs configuration file. '
-                     'Defaults to ~/.ssh/authprogs.yaml',
-                     metavar='FILE')
-    group.add_option('--configdir', dest='configdir',
-                     help='Path to authprogs configuration directory. '
-                     'Defaults to ~/.ssh/authprogs.d',
-                     metavar='DIR')
+    group.add_option(
+        '--keyname', dest='keyname',
+        help='Name for this key, used when matching '
+        'config blocks.')
+    group.add_option(
+        '--configfile', dest='configfile',
+        help='Path to authprogs configuration file. '
+        'Defaults to ~/.ssh/authprogs.yaml',
+        metavar='FILE')
+    group.add_option(
+        '--configdir', dest='configdir',
+        help='Path to authprogs configuration directory. '
+        'Defaults to ~/.ssh/authprogs.d',
+        metavar='DIR')
     group.add_option('--logfile', dest='logfile',
                      help='Write logging info to this file. '
                      'Defaults to no logging.',
@@ -529,21 +536,21 @@ def main():  # pylint: disable-msg=R0912,R0915
 
     except SSHEnvironmentError as err:
         ap.log('SSHEnvironmentError "%s"\n%s\n' % (
-                err, traceback.format_exc()))
+               err, traceback.format_exc()))
         sys.exit('authprogs: %s' % err)
     except ConfigError as err:
         ap.log('ConfigError "%s"\n%s\n' % (
-                err, traceback.format_exc()))
+               err, traceback.format_exc()))
         sys.exit('authprogs: %s' % err)
     except CommandRejected as err:
         sys.exit('authprogs: %s' % err)
     except Exception as err:
         if ap:
             ap.log('Unexpected exception: %s\n%s\n' % (
-                    err, traceback.format_exc()))
+                   err, traceback.format_exc()))
         else:
             sys.stderr.write('Unexpected exception: %s\n%s\n' % (
-                    err, traceback.format_exc()))
+                             err, traceback.format_exc()))
         sys.exit('authprogs experienced an unexpected exception.')
 
 
