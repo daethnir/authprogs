@@ -1,11 +1,17 @@
-authprogs (0.50.1) stable; urgency=low
+authprogs (0.5.3) stable; urgency=low
+
+  * Adds AUTHPROGS_KEYNAME environment variable.
+
+ -- Bri Hatch <bri@ifokr.org>  Sun, 14 Jun 2015 15:30:00 -0800
+
+authprogs (0.5.1) stable; urgency=low
 
   * Adds python 3 compatibility from bcl
   * Converts to setuptools
 
  -- Bri Hatch <bri@ifokr.org>  Sun, 13 Oct 2013 01:38:00 -0800
 
-authprogs (0.50) stable; urgency=low
+authprogs (0.5) stable; urgency=low
 
   * Initial release
 

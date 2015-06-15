@@ -432,6 +432,9 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
                         'keyname': self.keyname,
                         'ssh_original_comand': self.original_command_string,
                         'time': time.time()}
+
+        os.environ['AUTHPROGS_KEYNAME'] = self.keyname
+
         retcode = 126
         try:
             match = self.find_match()

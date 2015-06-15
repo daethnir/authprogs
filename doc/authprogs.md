@@ -519,6 +519,11 @@ by the sshd(8) binary:
 
 * `SSH_ORIGINAL_COMMAND`: The (squashed) original SSH command that was issued by the client.
 
+authprogs sets the following environment variables for use by the
+authenticated process
+
+* `AUTHPROGS_KEYNAME`: the value of the --keyname command line. Will be set to an empty string if no --keyname was set.
+
 ## EXIT STATUS
 
 authprogs returns 0 on success, non-zero on errors. In run mode it exits with
