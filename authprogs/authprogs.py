@@ -197,9 +197,12 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             self.logdebug('client_ip %s not in %s' % (client_ip, allow_from))
             return False
 
-    def load(self):
-        """Load our config."""
-
+    def get_merged_config(self):
+        """Get merged config file.
+        
+        Returns an open StringIO containing the
+        merged config file.
+        """
         if self.yamldocs:
             return
 
@@ -226,18 +229,33 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         self.logdebug('merged log file: """\n%s\n"""\n' %
                       merged_configfile.read())
         merged_configfile.seek(0)
+        return merged_configfile
 
+    def load(self):
+        """Load our config, log and raise on error."""
         try:
+            merged_configfile = self.get_merged_config()
             self.yamldocs = yaml.load(merged_configfile, Loader=Loader)
+
+            # Strip out the top level 'None's we get from concatenation.
+            # Functionally not required, but makes dumps cleaner.
+            self.yamldocs = [x for x in self.yamldocs if x]
+            self.logdebug('parsed_rules:\n%s\n' % pretty(self.yamldocs))
+
         except (yaml.scanner.ScannerError, yaml.parser.ParserError):
             self.raise_and_log_error(ConfigError, 'error parsing config.')
 
-        self.logdebug('parsed_rules:\n%s\n' % pretty(self.yamldocs))
-
     def dump_config(self):
         """Pretty print the configuration dict to stdout."""
-        self.load()
-        print('Configuration\n%s\n' % pretty(self.yamldocs))
+        yaml_content = self.get_merged_config()
+        print('YAML Configuration\n%s\n' % yaml_content.read())
+        try:
+            self.load()
+            print('Python Configuration\n%s\n' % pretty(self.yamldocs))
+        except ConfigError:
+            sys.stderr.write(
+                'config parse error. try running with --logfile=/dev/tty\n')
+            raise
 
     def install_key_data(self, keydata, target):
         """Install the key data into the open file."""
@@ -454,7 +472,7 @@ def main():  # pylint: disable-msg=R0912,R0915
         '--dump_config', dest='dump_config',
         action='store_true',
         help='Dump configuration (python format) '
-        'to standand out and exit.')
+        'to standard out and exit.')
     group.add_option(
         '--install_key', dest='install_key',
         help='Install the named ssh public key file to '

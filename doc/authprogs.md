@@ -174,24 +174,28 @@ to run complicated commandlines via ssh directly.
 
 ## CONFIGURATION FILES
 
-authprogs configuration files are written as a series of yaml documents.
-Each yaml document represents a single authprogs rule. These rules allow
-you to decide whether the client's command should be run based on
-criteria such as the command itself, the client IP address, and ssh
-key in use.
+authprogs rules are maintained in one or more configuration files
+in YAML format. 
+
+The rules allow you to decide whether the client's command should be run
+based on criteria such as the command itself, the client IP address, and
+ssh key in use.
 
 Rules can be read from a single file (`~/.ssh/authprogs.yaml` by default)
 or by putting files in a configuration directory (`~/.ssh/authprogs.d`).
 The configuration directory method is most useful when
 you want to be able to easily add or remove rules without manually
-editing a single configuration file.
+editing a single configuration file, such as when installing rules
+via your configuration tool of choice.
 
-Rules are read and processed in the following order:
+All the authprogs configuration files are concatenated
+together into one large yaml document which is then processed.
+The files are concatenated in the following order:
 
-* rules in the configuration file, from top to bottom.
-* rules in the configuration directory, processed in asciibetical order
+* `~/.ssh/authprogs.yaml`, if present
+* files in `~/.ssh/authprogs.d/` directory, in asciibetical order
 
-Dotfiles contained in a configuration directory are not processed.
+Dotfiles contained in a configuration directory are ignored.
 The configuration directory is not recursed; only those files directly
 contained are processed.
 
@@ -204,31 +208,33 @@ match for the command to be run.
 
 The general format of a rule is as follows:
 
-    --
-    # Selection options
-    #
-    # All must match or we stop processing this rule.
-    selection_option_1: value
-    selection_option_2: value
+    # First rule
+    -
+      # Selection options
+      #
+      # All must match or we stop processing this rule.
+      selection_option_1: value
+      selection_option_2: value
 
-    # The allow block, aka subrules
-    #
-    # This lets us group a bunch of possible commands
-    # into one rule. Otherwise we'd need a bunch of
-    # rules where you repeat selection options.
-    allow:
-        -
-        rule_type: value
-        rule_param_1: value
-        rule_param_2: value
-        -
-        rule_type: value2
-        rule_param_1: value
-        rule_param_2: value
-    --
+      # The allow block, aka subrules
+      #
+      # This lets us group a bunch of possible commands
+      # into one rule. Otherwise we'd need a bunch of
+      # rules where you repeat selection options.
 
-    # Next rule begins here
-    selection_option_3: value
+      allow:
+        -
+          rule_type: value
+          rule_param_1: value
+          rule_param_2: value
+        -
+          rule_type: value2
+          rule_param_1: value
+          rule_param_2: value
+
+    # Next rule
+    -
+      selection_option_3: value
     ...
 
 Some of the keys take single arguments, while others may take lists.
@@ -245,14 +251,19 @@ is gleaned by environment variables set by the SSH server.
 
 Examples:
 
-    --
-    from: 192.168.1.5
-    --
-    from: [192.168.0.1, 10.0.0.3]
-    --
-    from:
+    -
+      from: 192.168.1.5
+      ...
+
+    -
+      from: [192.168.0.1, 10.0.0.3]
+      ...
+
+    -
+      from:
         - 192.168.0.1
         - 10.10.0.3
+      ...
 
 * keynames:  This is a single value or list of values that define which
 SSH pubkeys are allowed to match this rule.  The keyname
@@ -261,14 +272,20 @@ authprogs command line in the entry in `authorized_keys`.
 
 Examples:
 
-    --
-    keynames: backups
-    --
-    keynames: [repo_push, repo_pull]
-    --
-    keynames:
+
+    -
+      keynames: backups
+      ...
+
+    -
+      keynames: [repo_push, repo_pull]
+      ...
+
+    -
+      keynames:
         - repo_push
         - repo_pull
+      ...
 
 ## ALLOW SUBRULE SECTION
 
@@ -278,18 +295,17 @@ Subrules can be simple, for example the explicit command match, or be
 more program-aware such as scp support. You specify which kind of
 subrule you want with the `rule_type` option:
 
-    --
-    allow:
+    -
+      allow:
         -
-        rule_type: command
-        command: /bin/touch /tmp/timestamp
+          rule_type: command
+          command: /bin/touch /tmp/timestamp
         -
-        command: /bin/rm /tmp/bar
+          command: /bin/rm /tmp/bar
         -
-        rule_type: scp
-        allow_upload: true
-        ...
-    --
+          rule_type: scp
+          allow_upload: true
+    ...
 
 See the separate subrules sections below for how to craft each type.
 
@@ -310,18 +326,16 @@ variants of a command if necessary.
 
 The simplest configuration looks like this:
 
-    --
-    allow:
+    -
+      allow:
         command: /bin/true
-            --
 
 Or you can provide a list of commands:
 
-    --
-    allow:
+    -
+      allow:
         - command: /bin/true
         - command: /bin/false
-    --
 
 A number of optional settings can tweak how command matching
 is performed.
@@ -333,18 +347,17 @@ is performed.
 
     Examples:
 
-        -
+      -
         allow:
-            -
+          -
             command: /bin/echo
             allow_trailing_args: true
-            -
+          -
             command: /bin/ls
             allow_trailing_args: true
-            -
+          -
             command: /bin/rm -i
             allow_trailing_args: true
-        -
 
 * `pcre_match: true`:  Compare the command using pcre regular expressions,
     rather than doing an explicit match character by character. The regex
@@ -357,24 +370,24 @@ is performed.
 
     Examples:
 
-        --
+      -
         allow:
-            -
-                # Touch the foo file, allowing any
-                # optional command line params
-                # before the filename
+          -
+            # Touch the foo file, allowing any
+            # optional command line params
+            # before the filename
 
-                command: ^touch\\s+(-\\S+\\s+)*foo$
-                pcre_match: true
-            -
-                # attempt to allow rm of files in /var/tmp
-                # but actually would fail to catch malicious
-                # commands e.g. /var/tmp/../../etc/passwd
-                #
-                # As I said, be careful with pcre matching!!!
+            command: ^touch\\s+(-\\S+\\s+)*foo$
+            pcre_match: true
+          -
+            # attempt to allow rm of files in /var/tmp
+            # but actually would fail to catch malicious
+            # commands e.g. /var/tmp/../../etc/passwd
+            #
+            # As I said, be careful with pcre matching!!!
 
-                command: ^/bin/rm\\s+(-\\S+\\s+)*/var/tmp/\\S*$
-                pcre_match: true
+            command: ^/bin/rm\\s+(-\\S+\\s+)*/var/tmp/\\S*$
+            pcre_match: true
 
 ## SCP SUBRULES
 
@@ -407,16 +420,16 @@ not restricted based on filename.
 
     Examples:
 
-        --
+      -
         allow:
-            - rule_type: scp
-              allow_download: true
-              files:
-                  - /etc/group
-                  - /etc/passwd
-            - rule_type: scp
-              allow_upload: true
-              files: [/tmp/file1, /tmp/file2]
+          - rule_type: scp
+            allow_download: true
+            files:
+              - /etc/group
+              - /etc/passwd
+          - rule_type: scp
+            allow_upload: true
+            files: [/tmp/file1, /tmp/file2]
 
 
 ## EXAMPLES
@@ -424,25 +437,36 @@ not restricted based on filename.
 Here is a sample configuration file with multiple rules,
 going from simple to more complex.
 
-    --
+Note that this config can be spread around between the
+`~/.ssh/authprogs.yaml` and `~/.ssh/authprogs.d` directory.
+
+
+    # All files should start with an initial solo dash -
+    # remember, we're being concatenated with all other
+    # files!
+
     # Simple commands, no IP restrictions.
-    allow:
+    -
+      allow:
         - command: /bin/tar czvf /backups/www.tgz /var/www/
         - command: /usr/bin/touch /var/www/.backups.complete
-    --
+
     # Similar, but with IP restrictions
-    from: [192.168.0.10, 192.168.0.15, 172.16.3.3]
-    allow:
+    -
+      from: [192.168.0.10, 192.168.0.15, 172.16.3.3]
+      allow:
         - command: git --git-dir=/var/repos/foo/.git pull
         - command: sudo /etc/init.d/apache2 restart
-    --
+
     # Some more complicated subrules
-    from:
+    -
+      # All of these 'allows' have the same 'from' restrictions
+      from:
         - 10.1.1.20
         - 10.1.1.21
         - 10.1.1.22
         - 10.1.1.23
-    allow:
+      allow:
         # Allow unrestricted ls
         - command: /bin/ls
           allow_trailing_args: true
@@ -460,9 +484,16 @@ going from simple to more complex.
         - rule_type: scp
           allow_upload: true
           files:
-              - /srv/backups/host1.tgz
-              - /srv/backups/host2.tgz
-              - /srv/backups/host3.tgz
+            - /srv/backups/host1.tgz
+            - /srv/backups/host2.tgz
+            - /srv/backups/host3.tgz
+
+
+## TROUBLESHOOTING
+
+`--dump_config` is your friend. If your yaml config isn't parsing,
+consider `--dump_config --logfile=/dev/tty` for more debug output
+to find the error.
 
 
 ## FILES
