@@ -5,3 +5,4 @@ include README
 include TODO
 include doc/authprogs.1
 include doc/authprogs.html
+include doc/description.rst
