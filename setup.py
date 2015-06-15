@@ -83,7 +83,8 @@ class Converter(object):
 
             target = open(htmlfile, 'w')
             self.created.append(htmlfile)
-            stdout = runcmd(['markdown', os.path.join(top, '%s.md' % name)])[1]
+            stdout = runcmd(['python', '-m', 'markdown',
+                             os.path.join(doc, '%s.md' % name)])[1]
             if not stdout:
                 raise Exception('markdown conversion failed, no output.')
             target.write(stdout)
@@ -146,6 +147,7 @@ setup(
          ['AUTHORS', 'COPYING', 'INSTALL', 'README',
           'TODO', 'doc/authprogs.html'])],
     test_suite='authprogs.tests',
+    setup_requires=['markdown'],
     install_requires=['pyyaml'],
     zip_safe=False,
     cmdclass={"install": APInstall, "sdist": APSdist},
