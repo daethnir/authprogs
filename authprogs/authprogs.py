@@ -306,13 +306,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             return
 
         filepath = orig_list.pop()
-        doubledash = orig_list.pop()
         arguments = orig_list
-
-        if doubledash != '--':
-            self.logdebug('skipping scp processing - '
-                          'format not recognized.\n')
-            return
 
         if '-f' in arguments:
             if not rule.get('allow_download'):
