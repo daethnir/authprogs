@@ -1,3 +1,9 @@
+authprogs (0.5.4) stable; urgency=low
+
+  * Improves scp support.
+
+ -- Bri Hatch <bri@ifokr.org>  Tue, 27 Oct 2015 16:12:22 -0700
+
 authprogs (0.5.3) stable; urgency=low
 
   * Adds AUTHPROGS_KEYNAME environment variable.
