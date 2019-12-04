@@ -1,4 +1,5 @@
 """authprogs: SSH command authenticator module.
+# vim: set ts=4 et
 
 Used to restrict which commands can be run via trusted SSH keys."""
 
@@ -34,7 +35,7 @@ import textwrap
 import time
 import traceback
 import yaml
-
+import ipaddress
 
 try:
     from yaml import CLoader as Loader
@@ -188,14 +189,24 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         allow_from = rule.get('from')
         if not isinstance(allow_from, list):
             allow_from = [allow_from]
-        client_ip = self.get_client_ip()
+        def ipnet(addr):
+            try:
+                return ipaddress.ip_network(addr, strict=False)
+            except ValueError:
+                return None
+        allow_from = [
+            ipnet(x.decode())
+            for x in allow_from
+        ]
+        allow_from = filter(lambda x: x, allow_from)
+        client_ip = ipaddress.ip_address(self.get_client_ip().decode())
 
-        if client_ip in allow_from:
-            self.logdebug('client_ip %s in %s\n' % (client_ip, allow_from))
-            return True
-        else:
-            self.logdebug('client_ip %s not in %s' % (client_ip, allow_from))
-            return False
+        for allow in allow_from:
+            if allow == u'*' or client_ip in allow:
+                self.logdebug('client_ip %s in %s\n' % (client_ip, allow))
+                return True
+        self.logdebug('client_ip %s not in %s' % (client_ip, allow_from))
+        return False
 
     def get_merged_config(self):
         """Get merged config file.

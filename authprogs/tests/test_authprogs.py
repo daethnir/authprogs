@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# vim: set ts=4 et
 """authprogs unit tests."""
 
 #    Copyright (C) 2013 Bri Hatch (daethnir) <bri@ifokr.org>
@@ -132,6 +133,12 @@ class AuthProgsTests(unittest.TestCase):
         # Not valid from this one
         ap = getap('0.0.0.1', 'MULTIPLE_TWO')
         self.assertRaises(authprogs.CommandRejected, ap.find_match)
+
+    def test_client_ip_cidr(self):
+        """Test that a single bare command works."""
+        ap = getap('10.11.12.13', 'CIDR')
+        self.assertEqual(ap.find_match(),
+                {'command': ['CIDR']})
 
     def test_keyname_nospace(self):
         """Verify we reject keynames with spaces."""
