@@ -135,10 +135,15 @@ class AuthProgsTests(unittest.TestCase):
         self.assertRaises(authprogs.CommandRejected, ap.find_match)
 
     def test_client_ip_cidr(self):
-        """Test that a single bare command works."""
+        """Test that a CIDR network range matches a sample address."""
         ap = getap('10.11.12.13', 'CIDR')
         self.assertEqual(ap.find_match(),
                 {'command': ['CIDR']})
+
+    def test_client_ip_cidr_neg(self):
+        """Test that a CIDR network range doesn't match a sample address."""
+        ap = getap('0.1.2.3', 'CIDR')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
 
     def test_keyname_nospace(self):
         """Verify we reject keynames with spaces."""

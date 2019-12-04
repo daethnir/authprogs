@@ -190,6 +190,8 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         if not isinstance(allow_from, list):
             allow_from = [allow_from]
         def ipnet(addr):
+            if addr.lower() in (u'*', u'any'):
+                addr = u'0.0.0.0/0'
             try:
                 return ipaddress.ip_network(addr, strict=False)
             except ValueError:
@@ -202,7 +204,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         client_ip = ipaddress.ip_address(self.get_client_ip().decode())
 
         for allow in allow_from:
-            if allow == u'*' or client_ip in allow:
+            if client_ip in allow:
                 self.logdebug('client_ip %s in %s\n' % (client_ip, allow))
                 return True
         self.logdebug('client_ip %s not in %s' % (client_ip, allow_from))
