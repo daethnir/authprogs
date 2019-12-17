@@ -1,3 +1,4 @@
+# vim: ts=4 et
 """authprogs: SSH command authenticator module.
 
 Used to restrict which commands can be run via trusted SSH keys."""
@@ -125,6 +126,10 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         self.configfile = configfile
         self.configdir = configdir
 
+    def __del__(self):
+        if self.logfh:
+            self.logfh.close()
+
     def raise_and_log_error(self, error, message):
         """Raise error, including message and original traceback.
 
@@ -223,7 +228,8 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         merged_configfile.write('-\n')
         for thefile in loadfiles:
             self.logdebug('reading in config file %s\n' % thefile)
-            merged_configfile.write(open(thefile).read())
+            with open(thefile, 'r') as merge:
+                merged_configfile.write(merge.read())
             merged_configfile.write('\n-\n')
         merged_configfile.seek(0)
         self.logdebug('merged log file: """\n%s\n"""\n' %
@@ -236,6 +242,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         try:
             merged_configfile = self.get_merged_config()
             self.yamldocs = yaml.load(merged_configfile, Loader=Loader)
+            merged_configfile.close()
 
             # Strip out the top level 'None's we get from concatenation.
             # Functionally not required, but makes dumps cleaner.
@@ -249,6 +256,8 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         """Pretty print the configuration dict to stdout."""
         yaml_content = self.get_merged_config()
         print('YAML Configuration\n%s\n' % yaml_content.read())
+        yaml_content.close()
+
         try:
             self.load()
             print('Python Configuration\n%s\n' % pretty(self.yamldocs))
