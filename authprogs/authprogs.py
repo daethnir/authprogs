@@ -42,6 +42,8 @@ try:
 except ImportError:
     from yaml import Loader
 
+if sys.version_info.major >= 3:
+	unicode = lambda x: x
 
 def pretty(thing):
     """Return pretty-printable version."""
@@ -189,19 +191,22 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         allow_from = rule.get('from')
         if not isinstance(allow_from, list):
             allow_from = [allow_from]
+
         def ipnet(addr):
-            if addr.lower() in (u'*', u'any'):
-                addr = u'0.0.0.0/0'
+            addr = unicode(addr)
+            if addr.lower() in ('*', 'any'):
+                addr = '0.0.0.0/0'
             try:
                 return ipaddress.ip_network(addr, strict=False)
             except ValueError:
                 return None
+
         allow_from = [
-            ipnet(x.decode())
+            ipnet(x)
             for x in allow_from
         ]
         allow_from = filter(lambda x: x, allow_from)
-        client_ip = ipaddress.ip_address(self.get_client_ip().decode())
+        client_ip = ipaddress.ip_address(unicode(self.get_client_ip()))
 
         for allow in allow_from:
             if client_ip in allow:
