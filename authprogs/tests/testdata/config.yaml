@@ -22,7 +22,7 @@
 -
     # test_command_with_args
     from: 
-        - a.b.c.d
+        - 9.8.7.6
         - 0.0.0.3
     allow:
         command: /bin/echo Hello     World
@@ -95,4 +95,15 @@
     keynames: baz
     allow:
         command: KEYTEST2
+-
+    # Test some cidr blocks
+    from: [10.0.0.0/8, 172.16.0.0/20, 192.168.0.0/16]
+    allow:
+        command: CIDR
+-
+    # Test unparseable addresses
+    from:
+        - a.b.c.d
+    allow:
+        command: UNPARSEABLE
 -

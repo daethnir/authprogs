@@ -247,7 +247,8 @@ you limit under what conditions the rule matches.
 
 * from: This is a single value or list of values that define what SSH client
 IP addresses are allowed to match this rule. The client IP address
-is gleaned by environment variables set by the SSH server.
+is gleaned by environment variables set by the SSH server. Any from value
+may be an IP address or a CIDR network.
 
 Examples:
 
@@ -261,7 +262,7 @@ Examples:
 
     -
       from:
-        - 192.168.0.1
+        - 192.168.0.0/24
         - 10.10.0.3
       ...
 
