@@ -22,7 +22,7 @@ MARKDOWN2TEXT = ['AUTHORS', 'INSTALL', 'README', 'TODO']
 if sys.version_info[0] == 2:
     console_script = 'authprogs'
 else:
-    console_script = 'authprogs%d' % sys.version_info.major
+    console_script = 'authprogs{}'.format(sys.version_info.major)
 
 def long_description():
     """Read our long description from the fs."""
@@ -38,8 +38,8 @@ def runcmd(command, command_input=None, cwd=None):
                             cwd=cwd)
     (stdout, stderr) = proc.communicate(command_input)
     if proc.returncode != 0:
-        sys.stderr.write('ABORTING: command "%s" failed w/ code %s:\n'
-                         '%s\n%s' % (command, proc.returncode,
+        sys.stderr.write('ABORTING: command "{}" failed w/ code {}:\n'
+                         '{}\n{}'.format(command, proc.returncode,
                                      stdout, stderr))
         sys.exit(proc.returncode)
     return proc.returncode, stdout, stderr
@@ -69,7 +69,7 @@ class Converter(object):
                 retval = subprocess.call(['ronn', '-r', man_ronn])
                 if retval != 0:
                     raise Exception('ronn man page conversion failed, '
-                                    'returned %s' % retval)
+                                    'returned {}'.format(retval))
                 self.created.append(man_1)
         except:
             raise Exception('ronn required for manpage conversion - do you '
@@ -77,14 +77,14 @@ class Converter(object):
 
         # Markdown files in docs dir get converted to .html
         for name in MARKDOWN2HTML:
-            htmlfile = os.path.join(doc, '%s.html' % name)
+            htmlfile = os.path.join(doc, '{}.html'.format(name))
             if os.path.exists(htmlfile):
                 continue
 
             target = open(htmlfile, 'w')
             self.created.append(htmlfile)
             stdout = runcmd(['python', '-m', 'markdown',
-                             os.path.join(doc, '%s.md' % name)])[1]
+                             os.path.join(doc, '{}.md'.format(name))])[1]
             if not stdout:
                 raise Exception('markdown conversion failed, no output.')
             target.write(stdout)
@@ -95,7 +95,7 @@ class Converter(object):
             target = os.path.join(top, name)
             if os.path.exists(target):
                 continue
-            source = os.path.join(top, '%s.md' % target)
+            source = os.path.join(top, '{}.md'.format(target))
             shutil.copy(source, target)
             self.created.append(target)
 
@@ -152,6 +152,6 @@ setup(
     zip_safe=False,
     cmdclass={"install": APInstall, "sdist": APSdist},
     entry_points={
-        'console_scripts': ['%s = authprogs.authprogs:main' % console_script]
+        'console_scripts': ['{} = authprogs.authprogs:main'.format(console_script)]
     },
 )

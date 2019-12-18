@@ -139,8 +139,8 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         error: the error to raise
         message: the user-facing error message
         """
-        self.log('raising %s, traceback %s\n' %
-                 (error, traceback.format_exc()))
+        self.log('raising {}, traceback {}\n'.format(
+                 error, traceback.format_exc()))
         raise error(message)
 
     def get_client_ip(self):
@@ -153,7 +153,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             client = os.environ.get('SSH_CONNECTION',
                                     os.environ.get('SSH_CLIENT'))
             self.client_ip = client.split()[0]
-            self.logdebug('client_ip: %s\n' % self.client_ip)
+            self.logdebug('client_ip: {}\n'.format(self.client_ip))
             return self.client_ip
         except:
             raise SSHEnvironmentError('cannot identify the ssh client '
@@ -180,10 +180,10 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             keynames = [keynames]
 
         if self.keyname in keynames:
-            self.logdebug('keyname "%s" matches rule.\n' % self.keyname)
+            self.logdebug('keyname "{}" matches rule.\n'.format(self.keyname))
             return True
         else:
-            self.logdebug('keyname "%s" does not match rule.\n' % self.keyname)
+            self.logdebug('keyname "{}" does not match rule.\n'.format(self.keyname))
             return False
 
     def check_client_ip(self, rule):
@@ -215,9 +215,9 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
 
         for allow in allow_from:
             if client_ip in allow:
-                self.logdebug('client_ip %s in %s\n' % (client_ip, allow))
+                self.logdebug('client_ip {} in {}\n'.format(client_ip, allow))
                 return True
-        self.logdebug('client_ip %s not in %s' % (client_ip, allow_from))
+        self.logdebug('client_ip {} not in {}'.format(client_ip, allow_from))
         return False
 
     def get_merged_config(self):
@@ -245,13 +245,13 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         merged_configfile = io.StringIO()
         merged_configfile.write('-\n')
         for thefile in loadfiles:
-            self.logdebug('reading in config file %s\n' % thefile)
+            self.logdebug('reading in config file {}\n'.format(thefile))
             with open(thefile, 'r') as merge:
                 merged_configfile.write(merge.read())
             merged_configfile.write('\n-\n')
         merged_configfile.seek(0)
-        self.logdebug('merged log file: """\n%s\n"""\n' %
-                      merged_configfile.read())
+        self.logdebug('merged log file: """\n{}\n"""\n'.format(
+                      merged_configfile.read()))
         merged_configfile.seek(0)
         return merged_configfile
 
@@ -265,7 +265,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             # Strip out the top level 'None's we get from concatenation.
             # Functionally not required, but makes dumps cleaner.
             self.yamldocs = [x for x in self.yamldocs if x]
-            self.logdebug('parsed_rules:\n%s\n' % pretty(self.yamldocs))
+            self.logdebug('parsed_rules:\n{}\n'.format(pretty(self.yamldocs)))
 
         except (yaml.scanner.ScannerError, yaml.parser.ParserError):
             self.raise_and_log_error(ConfigError, 'error parsing config.')
@@ -273,12 +273,12 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
     def dump_config(self):
         """Pretty print the configuration dict to stdout."""
         yaml_content = self.get_merged_config()
-        print('YAML Configuration\n%s\n' % yaml_content.read())
+        print('YAML Configuration\n{}\n'.format(yaml_content.read()))
         yaml_content.close()
 
         try:
             self.load()
-            print('Python Configuration\n%s\n' % pretty(self.yamldocs))
+            print('Python Configuration\n{}\n'.format(pretty(self.yamldocs)))
         except ConfigError:
             sys.stderr.write(
                 'config parse error. try running with --logfile=/dev/tty\n')
@@ -293,16 +293,16 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         if keydata in contents:
             raise InstallError('key data already in file - refusing '
                                'to double-install.\n')
-        command = '%s --run' % self.authprogs_binary
+        command = '{} --run'.format(self.authprogs_binary)
         if self.logfile:
-            command += ' --logfile=%s' % self.logfile
+            command += ' --logfile={}'.format(self.logfile)
         if self.keyname:
-            command += ' --keyname=%s' % self.keyname
+            command += ' --keyname={}'.format(self.keyname)
 
-        target.write('command="%(command)s",%(ssh_opts)s %(keydata)s\n' %
-                     {'command': command,
-                      'keydata': keydata,
-                      'ssh_opts': ssh_opts})
+        target.write('command="{command}",{ssh_opts} {keydata}\n'.format(
+                     command=command,
+                      keydata=keydata,
+                      ssh_opts=ssh_opts))
 
     def install_key(self, keyfile, authorized_keys):
         """Install a key into the authorized_keys file."""
@@ -328,8 +328,8 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         binary = orig_list.pop(0)
         allowed_binaries = ['scp', '/usr/bin/scp']
         if binary not in allowed_binaries:
-            self.logdebug('skipping scp processing - binary "%s" '
-                          'not in approved list.\n' % binary)
+            self.logdebug('skipping scp processing - binary "{}" '
+                          'not in approved list.\n'.format(binary))
             return
 
         filepath = orig_list.pop()
@@ -361,8 +361,8 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             if not isinstance(files, list):
                 files = [files]
             if filepath not in files:
-                self.log('scp denied - file "%s" - not in approved '
-                         'list %s\n' % (filepath, files))
+                self.log('scp denied - file "{}" - not in approved '
+                         'list {}\n'.format(filepath, files))
                 return
 
         # Allow it!
@@ -374,8 +374,8 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         command_string = rule['command']
         command_list = command_string.split()
 
-        self.logdebug('comparing "%s" to "%s"\n' %
-                      (command_list, self.original_command_list))
+        self.logdebug('comparing "{}" to "{}"\n'.format(
+                      command_list, self.original_command_list))
         if rule.get('allow_trailing_args'):
             self.logdebug('allow_trailing_args is true - comparing initial '
                           'list.\n')
@@ -403,7 +403,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
 
         self.load()
         for yamldoc in self.yamldocs:
-            self.logdebug('\nchecking rule """%s"""\n' % yamldoc)
+            self.logdebug('\nchecking rule """{}"""\n'.format(yamldoc))
 
             if not yamldoc:
                 continue
@@ -427,7 +427,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
                 elif rule_type == 'scp':
                     sub = self.find_match_scp
                 else:
-                    self.log('fatal: no such rule_type "%s"\n' % rule_type)
+                    self.log('fatal: no such rule_type "{}"\n'.format(rule_type))
                     self.raise_and_log_error(ConfigError,
                                              'error parsing config.')
 
@@ -436,8 +436,8 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
                     return match
 
         # No matches, time to give up.
-        raise CommandRejected('command "%s" denied.' %
-                              self.original_command_string)
+        raise CommandRejected('command "{}" denied.'.format(
+                              self.original_command_string))
 
     def exec_command(self):
         """Glean the command to run and exec.
@@ -460,16 +460,16 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         try:
             match = self.find_match()
             command_info['command'] = match.get('command')
-            self.logdebug('find_match returned "%s"\n' % match)
+            self.logdebug('find_match returned "{}"\n'.format(match))
 
             command = match['command']
             retcode = subprocess.call(command)
             command_info['code'] = retcode
-            self.log('result: %s\n' % command_info)
+            self.log('result: {}\n'.format(command_info))
             sys.exit(retcode)
         except (CommandRejected, OSError) as err:
-            command_info['exception'] = '%s' % err
-            self.log('result: %s\n' % command_info)
+            command_info['exception'] = '{}'.format(err)
+            self.log('result: {}\n'.format(command_info))
             sys.exit(retcode)
 
 
@@ -566,7 +566,7 @@ def main():  # pylint: disable-msg=R0912,R0915
                 sys.stderr.write('Key installed successfully.\n')
                 sys.exit(0)
             except InstallError as err:
-                sys.stderr.write('Key install failed: %s' % err)
+                sys.stderr.write('Key install failed: {}'.format(err))
                 sys.exit(1)
 
         elif opts.run:
@@ -577,21 +577,21 @@ def main():  # pylint: disable-msg=R0912,R0915
             parser.error('Not sure what to do. Consider --help')
 
     except SSHEnvironmentError as err:
-        ap.log('SSHEnvironmentError "%s"\n%s\n' % (
+        ap.log('SSHEnvironmentError "{}"\n{}\n'.format(
                err, traceback.format_exc()))
-        sys.exit('authprogs: %s' % err)
+        sys.exit('authprogs: {}'.format(err))
     except ConfigError as err:
-        ap.log('ConfigError "%s"\n%s\n' % (
-               err, traceback.format_exc()))
-        sys.exit('authprogs: %s' % err)
+        ap.log('ConfigError "{}"\n{}\n'.format((
+               err, traceback.format_exc())))
+        sys.exit('authprogs: {}'.format(err))
     except CommandRejected as err:
-        sys.exit('authprogs: %s' % err)
+        sys.exit('authprogs: {}'.format(err))
     except Exception as err:
         if ap:
-            ap.log('Unexpected exception: %s\n%s\n' % (
-                   err, traceback.format_exc()))
+            ap.log('Unexpected exception: {}\n{}\n'.format((
+                   err, traceback.format_exc())))
         else:
-            sys.stderr.write('Unexpected exception: %s\n%s\n' % (
+            sys.stderr.write('Unexpected exception: {}\n{}\n'.format(
                              err, traceback.format_exc()))
         sys.exit('authprogs experienced an unexpected exception.')
 

@@ -36,8 +36,8 @@ def getap(client_ip='1.1.1.1', command='/bin/false',
 
     # Force a valid SSH client and command, which may be overridden
     # in a test. Must override any that our shell already had!
-    os.environ['SSH_CONNECTION'] = '%s 49725 127.0.0.1 22' % client_ip
-    os.environ['SSH_CLIENT'] = '%s 49725 22' % client_ip
+    os.environ['SSH_CONNECTION'] = '{} 49725 127.0.0.1 22'.format(client_ip)
+    os.environ['SSH_CLIENT'] = '{} 49725 22'.format(client_ip)
 
     os.environ.pop('SSH_ORIGINAL_COMMAND', None)
     if command:
@@ -335,8 +335,8 @@ class AuthProgsTests(unittest.TestCase):
         thefile.write('\n')
 
         keydata = 'ssh-rsa BBBB here@example.com'
-        expected = ('%s\ncommand="/path/to/ap --run",no-port-forwarding %s\n'
-                    % (initial_contents, keydata))
+        expected = ('{}\ncommand="/path/to/ap --run",no-port-forwarding {}\n'.format(
+                    initial_contents, keydata))
 
         ap = getap(authprogs_binary='/path/to/ap')
         ap.install_key_data(keydata, thefile)
@@ -352,9 +352,9 @@ class AuthProgsTests(unittest.TestCase):
         thefile.write('\n')
 
         keydata = 'ssh-rsa BBBB here@example.com'
-        expected = ('%s\ncommand="/path/to/ap --run --logfile=/tmp/foo",'
-                    'no-port-forwarding %s\n' %
-                    (initial_contents, keydata))
+        expected = ('{}\ncommand="/path/to/ap --run --logfile=/tmp/foo",'
+                    'no-port-forwarding {}\n'.format(
+                    initial_contents, keydata))
 
         ap = getap(authprogs_binary='/path/to/ap', logfile='/tmp/foo')
         ap.install_key_data(keydata, thefile)
