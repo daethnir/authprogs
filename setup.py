@@ -20,9 +20,9 @@ MARKDOWN2HTML = ['authprogs']
 MARKDOWN2TEXT = ['AUTHORS', 'INSTALL', 'README', 'TODO']
 
 if sys.version_info[0] == 2:
-    console_script = 'authprogs'
+    console_script = 'authprogs2'
 else:
-    console_script = 'authprogs{}'.format(sys.version_info.major)
+    console_script = 'authprogs'
 
 
 def long_description():
