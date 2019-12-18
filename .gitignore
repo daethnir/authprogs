@@ -15,6 +15,7 @@
 
 # Python egg metadata
 /*.egg-info
+/.eggs
 
 # setuptools build directory
 /build/
