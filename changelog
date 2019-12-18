@@ -1,3 +1,9 @@
+authprogs (0.6.0) stable; urgency=low
+  * Add CIDR IP address matching (xdgc)
+  * NFC code cleanup
+
+ -- Bri Hatch <bri@ifokr.org>  Tue, 17 Dec 2019 18:00:00 -0800 
+
 authprogs (0.5.4) stable; urgency=low
 
   * Improves scp support.
