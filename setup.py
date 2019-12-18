@@ -24,6 +24,7 @@ if sys.version_info[0] == 2:
 else:
     console_script = 'authprogs{}'.format(sys.version_info.major)
 
+
 def long_description():
     """Read our long description from the fs."""
     with open('doc/description.rst') as filed:
@@ -32,21 +33,26 @@ def long_description():
 
 def runcmd(command, command_input=None, cwd=None):
     """Run a command, potentially sending stdin, and capturing stdout/err."""
-    proc = subprocess.Popen(command, stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            cwd=cwd)
+    proc = subprocess.Popen(
+        command,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=cwd,
+    )
     (stdout, stderr) = proc.communicate(command_input)
     if proc.returncode != 0:
-        sys.stderr.write('ABORTING: command "{}" failed w/ code {}:\n'
-                         '{}\n{}'.format(command, proc.returncode,
-                                     stdout, stderr))
+        sys.stderr.write(
+            'ABORTING: command "{}" failed w/ code {}:\n'
+            '{}\n{}'.format(command, proc.returncode, stdout, stderr)
+        )
         sys.exit(proc.returncode)
     return proc.returncode, stdout, stderr
 
 
 class Converter(object):
     """Documentation conversion class."""
+
     def __init__(self):
         """Init."""
         self.created = []
@@ -68,12 +74,16 @@ class Converter(object):
                 self.created.append(man_ronn)
                 retval = subprocess.call(['ronn', '-r', man_ronn])
                 if retval != 0:
-                    raise Exception('ronn man page conversion failed, '
-                                    'returned {}'.format(retval))
+                    raise Exception(
+                        'ronn man page conversion failed, '
+                        'returned {}'.format(retval)
+                    )
                 self.created.append(man_1)
         except:
-            raise Exception('ronn required for manpage conversion - do you '
-                            'have it installed?')
+            raise Exception(
+                'ronn required for manpage conversion - do you '
+                'have it installed?'
+            )
 
         # Markdown files in docs dir get converted to .html
         for name in MARKDOWN2HTML:
@@ -83,8 +93,14 @@ class Converter(object):
 
             target = open(htmlfile, 'w')
             self.created.append(htmlfile)
-            stdout = runcmd(['python', '-m', 'markdown',
-                             os.path.join(doc, '{}.md'.format(name))])[1]
+            stdout = runcmd(
+                [
+                    'python',
+                    '-m',
+                    'markdown',
+                    os.path.join(doc, '{}.md'.format(name)),
+                ]
+            )[1]
             if not stdout:
                 raise Exception('markdown conversion failed, no output.')
             target.write(stdout)
@@ -143,15 +159,26 @@ setup(
     packages=['authprogs'],
     data_files=[
         ('share/man/man1/', ['doc/authprogs.1']),
-        ('share/doc/authprogs/',
-         ['AUTHORS', 'COPYING', 'INSTALL', 'README',
-          'TODO', 'doc/authprogs.html'])],
+        (
+            'share/doc/authprogs/',
+            [
+                'AUTHORS',
+                'COPYING',
+                'INSTALL',
+                'README',
+                'TODO',
+                'doc/authprogs.html',
+            ],
+        ),
+    ],
     test_suite='authprogs.tests',
     setup_requires=['markdown'],
     install_requires=['pyyaml'],
     zip_safe=False,
     cmdclass={"install": APInstall, "sdist": APSdist},
     entry_points={
-        'console_scripts': ['{} = authprogs.authprogs:main'.format(console_script)]
+        'console_scripts': [
+            '{} = authprogs.authprogs:main'.format(console_script)
+        ]
     },
 )
