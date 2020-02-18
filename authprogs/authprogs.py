@@ -26,7 +26,7 @@ try:
 except ImportError:
     import io
 
-import optparse
+import argparse
 import os
 import pprint
 import re
@@ -513,10 +513,10 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
 
 def main():  # pylint: disable-msg=R0912,R0915
     """Main."""
-    parser = optparse.OptionParser()
+    parser = argparse.ArgumentParser()
     parser.usage = textwrap.dedent(
         """\
-    %prog {--run|--install_key|--dump_config} [options]
+    %(prog)s {--run|--install_key|--dump_config} [options]
 
     SSH command authenticator.
 
@@ -524,12 +524,11 @@ def main():  # pylint: disable-msg=R0912,R0915
     """
     )
 
-    group = optparse.OptionGroup(
-        parser,
+    group = parser.add_argument_group(
         'Run Mode Options',
         'These options determine in which mode the authprogs program runs.',
     )
-    group.add_option(
+    group.add_argument(
         '-r',
         '--run',
         dest='run',
@@ -537,53 +536,52 @@ def main():  # pylint: disable-msg=R0912,R0915
         help='Act as ssh command authenticator. Use this '
         'when calling from authorized_keys.',
     )
-    group.add_option(
+    group.add_argument(
         '--dump_config',
         dest='dump_config',
         action='store_true',
         help='Dump configuration (python format) to standard out and exit.',
     )
-    group.add_option(
+    group.add_argument(
         '--install_key',
         dest='install_key',
         help='Install the named ssh public key file to authorized_keys.',
         metavar='FILE',
     )
-    parser.add_option_group(group)
 
-    group = optparse.OptionGroup(parser, 'Other Options')
-    group.add_option(
+    group = parser.add_argument_group('Other Options')
+    group.add_argument(
         '--keyname',
         dest='keyname',
         help='Name for this key, used when matching config blocks.',
     )
-    group.add_option(
+    group.add_argument(
         '--configfile',
         dest='configfile',
         help='Path to authprogs configuration file. '
         'Defaults to ~/.ssh/authprogs.yaml',
         metavar='FILE',
     )
-    group.add_option(
+    group.add_argument(
         '--configdir',
         dest='configdir',
         help='Path to authprogs configuration directory. '
         'Defaults to ~/.ssh/authprogs.d',
         metavar='DIR',
     )
-    group.add_option(
+    group.add_argument(
         '--logfile',
         dest='logfile',
         help='Write logging info to this file. Defaults to no logging.',
         metavar='FILE',
     )
-    group.add_option(
+    group.add_argument(
         '--debug',
         dest='debug',
         action='store_true',
         help='Write additional debugging information to --logfile',
     )
-    group.add_option(
+    group.add_argument(
         '--authorized_keys',
         dest='authorized_keys',
         default=os.path.expanduser('~/.ssh/authorized_keys'),
@@ -591,48 +589,45 @@ def main():  # pylint: disable-msg=R0912,R0915
         '--install_key. Defaults to ~/.ssh/authorized_keys',
         metavar='FILE',
     )
-    parser.add_option_group(group)
 
-    opts, args = parser.parse_args()
-    if args:
-        sys.exit('authprogs does not accept commandline arguments.')
+    args = parser.parse_args()
 
-    if not opts.configfile:
+    if not args.configfile:
         cfg = os.path.expanduser('~/.ssh/authprogs.yaml')
         if os.path.isfile(cfg):
-            opts.configfile = cfg
-    if not opts.configdir:
+            args.configfile = cfg
+    if not args.configdir:
         cfg = os.path.expanduser('~/.ssh/authprogs.d')
         if os.path.isdir(cfg):
-            opts.configdir = cfg
+            args.configdir = cfg
 
-    if opts.debug and not opts.logfile:
+    if args.debug and not args.logfile:
         parser.error('--debug requires use of --logfile')
 
     ap = None
     try:
         ap = AuthProgs(
-            logfile=opts.logfile,  # pylint: disable-msg=C0103
-            configfile=opts.configfile,
-            configdir=opts.configdir,
-            debug=opts.debug,
-            keyname=opts.keyname,
+            logfile=args.logfile,  # pylint: disable-msg=C0103
+            configfile=args.configfile,
+            configdir=args.configdir,
+            debug=args.debug,
+            keyname=args.keyname,
         )
 
-        if opts.dump_config:
+        if args.dump_config:
             ap.dump_config()
             sys.exit(0)
 
-        elif opts.install_key:
+        elif args.install_key:
             try:
-                ap.install_key(opts.install_key, opts.authorized_keys)
+                ap.install_key(args.install_key, args.authorized_keys)
                 sys.stderr.write('Key installed successfully.\n')
                 sys.exit(0)
             except InstallError as err:
                 sys.stderr.write('Key install failed: {}'.format(err))
                 sys.exit(1)
 
-        elif opts.run:
+        elif args.run:
             ap.exec_command()
             sys.exit('authprogs command returned - should never happen.')
         else:
