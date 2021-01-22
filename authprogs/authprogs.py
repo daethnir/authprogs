@@ -386,12 +386,93 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             files = rule.get('files')
             if not isinstance(files, list):
                 files = [files]
-            if filepath not in files:
+            if rule.get('pcre_match'):
+                for file_pattern in files:
+                    if re.search( file_pattern, filepath ):
+                        # Allow it!
+                        return {'command': self.original_command_list}
                 self.log(
                     'scp denied - file "{}" - not in approved '
-                    'list {}\n'.format(filepath, files)
+                    'regex {}\n'.format( filepath, files )
                 )
                 return
+            else:
+                if filepath not in files:
+                    self.log(
+                        'scp denied - file "{}" - not in approved '
+                        'list {}\n'.format(filepath, files)
+                    )
+                    return
+
+        # Allow it!
+        return {'command': self.original_command_list}
+
+    def find_match_rsync( self, rule ):
+        """Handle rsync commands"""
+
+        orig_list = []
+        orig_list.extend(self.original_command_list)
+        binary = orig_list.pop(0)
+        allowed_binaries = ['rsync', '/usr/bin/rsync']
+        if binary not in allowed_binaries:
+            self.logdebug(
+                'skipping scp processing - binary "{}" '
+                'not in approved list.\n'.format(binary)
+            )
+            return
+
+        filepaths = []
+        while len( orig_list ) > 0:
+            path = orig_list.pop()
+            if path == ".":
+                break
+            filepaths.append( path )
+
+        arguments = orig_list
+
+        if '--server' not in arguments:
+            self.log(
+                'rsync denied - not in server mode.\n'
+            )
+            return
+
+        if '--sender' in arguments:
+            if not rule.get( 'allow_download' ):
+                self.log(
+                    'rsync denied - downloading forbidden.\n'
+                )
+                return
+        else:
+            if not rule.get( 'allow_upload' ):
+                self.log(
+                    'rsync denied - uploading forbidden.\n'
+                )
+                return
+
+        if rule.get('files'):
+            files = rule.get('files')
+            if not isinstance(files, list):
+                files = [files]
+            if rule.get('pcre_match'):
+                for filepath in filepaths:
+                    cnt = 0
+                    for file_pattern in files:
+                        if re.search( file_pattern, filepath ):
+                            cnt++
+                    if cnt == 0:
+                        self.log(
+                            'rsync denied - file "{}" - not in approved '
+                            'regex {}\n'.format( filepath, files )
+                        )
+                        return
+            else:
+                for filepath in filepaths:
+                    if filepath not in files:
+                        self.log(
+                            'rsync denied - file "{}" - not in approved '
+                            'list {}\n'.format(filepath, files)
+                        )
+                        return
 
         # Allow it!
         return {'command': self.original_command_list}
@@ -457,6 +538,8 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
                     sub = self.find_match_command
                 elif rule_type == 'scp':
                     sub = self.find_match_scp
+                elif rule_type == 'rsync':
+                    sub = self.find_match_rsync
                 else:
                     self.log(
                         'fatal: no such rule_type "{}"\n'.format(rule_type)
