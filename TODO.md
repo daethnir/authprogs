@@ -6,6 +6,9 @@ Below are things that I can envision implementing or improving.
 The presense of something on this list does not mean that
 it will be implemented.
 
+Contributors are encouraged to reach out in advance
+to kibbiz about implementation.
+
 * security improvements
     * refuse to run if any files are world writeable
 
