@@ -311,9 +311,14 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         target.seek(0)
         contents = target.read()
         ssh_opts = 'no-port-forwarding'
+        keydata = keydata.strip()
         if keydata in contents:
             raise InstallError(
                 'key data already in file - refusing to double-install.\n'
+            )
+        if '\n' in keydata:
+            raise InstallError(
+                'install file does not appear to be an ssh pubkey\n'
             )
         command = '{} --run'.format(self.authprogs_binary)
         if self.logfile:
