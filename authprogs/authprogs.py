@@ -21,15 +21,12 @@ Used to restrict which commands can be run via trusted SSH keys."""
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-try:
-    import StringIO as io
-except ImportError:
-    import io
-
 from . import rsync as rsync_checker
 
 import argparse
 import glob
+import io
+import ipaddress
 import os
 import pprint
 import re
@@ -39,7 +36,6 @@ import textwrap
 import time
 import traceback
 import yaml
-import ipaddress
 
 try:
     from yaml import CLoader as Loader
