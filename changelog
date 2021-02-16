@@ -1,3 +1,8 @@
+authprogs (0.7.1) testing; urgency=low
+  * add --silent option
+
+ -- Bri Hatch <bri@ifokr.org>  Tue, 02 Feb 2021 19:00:00 -0800
+
 authprogs (0.7.0) testing; urgency=low
   * initial rsync support
 
