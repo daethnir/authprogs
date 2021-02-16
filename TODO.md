@@ -41,14 +41,18 @@ to kibbiz about implementation.
     * case-insensitive pcre
     * whitespace support (clunky/worrisome)
     * shell regex command matching
-    * scp parsing additions
-        * support for `-v`
-        * support for `-d` (targetshouldbedirectory)
     * new smart command support
         * rsync support
 
 * forced command specification
-    * allow you to match a command and then run something else
+    * allow you to match a command and then run something completely different
 
 * ability to function as a login shell
     * would lose `--name` functionality
+
+* scp subrules
+    * make scp handling check that the scp binary path is
+      valid so to avoid any $PATH trickery, similar to how
+      its done in rsync
+    * support for `-v`
+    * support for `-d` (targetshouldbedirectory)
