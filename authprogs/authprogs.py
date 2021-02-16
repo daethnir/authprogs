@@ -238,7 +238,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
 
     def get_merged_config(self):
         """Get merged config file.
-        
+
         Returns an open StringIO containing the
         merged config file.
         """
@@ -295,12 +295,10 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
     def dump_config(self):
         """Pretty print the configuration dict to stdout."""
         yaml_content = self.get_merged_config()
-        print('YAML Configuration\n{}\n'.format(yaml_content.read()))
         yaml_content.close()
 
         try:
             self.load()
-            print('Python Configuration\n{}\n'.format(pretty(self.yamldocs)))
         except ConfigError:
             sys.stderr.write(
                 'config parse error. try running with --logfile=/dev/tty\n'
@@ -639,7 +637,7 @@ def main():  # pylint: disable-msg=R0912,R0915
         )
         sys.exit('authprogs: {}'.format(err))
     except ConfigError as err:
-        ap.log('ConfigError "{}"\n{}\n'.format((err, traceback.format_exc())))
+        ap.log('ConfigError "{}"\n{}\n'.format(err, traceback.format_exc()))
         sys.exit('authprogs: {}'.format(err))
     except CommandRejected as err:
         sys.exit('authprogs: {}'.format(err))
@@ -647,7 +645,7 @@ def main():  # pylint: disable-msg=R0912,R0915
         if ap:
             ap.log(
                 'Unexpected exception: {}\n{}\n'.format(
-                    (err, traceback.format_exc())
+                    err, traceback.format_exc()
                 )
             )
         else:
