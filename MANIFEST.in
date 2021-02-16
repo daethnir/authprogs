@@ -2,7 +2,9 @@ include AUTHORS
 include COPYING
 include INSTALL
 include README
+include README.rsync
 include TODO
 include doc/authprogs.1
 include doc/authprogs.html
+include doc/authprogs.md
 include doc/description.rst

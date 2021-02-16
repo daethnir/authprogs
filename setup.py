@@ -22,7 +22,7 @@ if sys.version_info < (3, 3):
 
 # Documents that should be converted or renamed from markdown
 MARKDOWN2HTML = ['authprogs']
-MARKDOWN2TEXT = ['AUTHORS', 'INSTALL', 'README', 'TODO']
+MARKDOWN2TEXT = ['AUTHORS', 'INSTALL', 'README', 'README.rsync', 'TODO']
 
 console_script = 'authprogs'
 
