@@ -54,7 +54,7 @@ def getap(
         )
 
     ap = authprogs.AuthProgs(
-        logfile=logfile, configdir=configdir, configfile=configfile, **ap_args
+        logfile=logfile, configdir=configdir, configfile=configfile, silent=True, **ap_args
     )
     return ap
 

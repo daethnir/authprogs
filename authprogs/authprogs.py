@@ -113,6 +113,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         self.debug = debug
         self.logfile = logfile
         self.client_ip = None
+        self.silent = kwargs.get('silent')
         if logfile:
             self.logfh = open(logfile, 'a')
         else:
@@ -545,9 +546,10 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
                     return match
 
         # No matches, time to give up.
-        sys.stderr.write(
-            'command "{}" rejected.\n'.format(self.original_command_string)
-        )
+        if not self.silent:
+            sys.stderr.write(
+                'command "{}" rejected.\n'.format(self.original_command_string)
+            )
         raise CommandRejected(
             'command "{}" denied.'.format(self.original_command_string)
         )
@@ -660,6 +662,12 @@ def main():  # pylint: disable-msg=R0912,R0915
         help='Write additional debugging information to --logfile',
     )
     group.add_argument(
+        '--silent',
+        dest='silent',
+        action='store_true',
+        help='Do not tell user their command was rejected on failure.',
+    )
+    group.add_argument(
         '--authorized_keys',
         dest='authorized_keys',
         default=os.path.expanduser('~/.ssh/authorized_keys'),
@@ -690,6 +698,7 @@ def main():  # pylint: disable-msg=R0912,R0915
             configdir=args.configdir,
             debug=args.debug,
             keyname=args.keyname,
+            silent=args.silent,
         )
 
         if args.dump_config:

@@ -48,10 +48,6 @@ to kibbiz about implementation.
 * ability to function as a login shell
     * would lose `--name` functionality
 
-* add --silent option to authprogs that prevents any
-  authprogs error message to user; make the default
-  behaviour inform the user when command is rejected.
-
 * rsync subrules
     * investigate --include / --exclude / --files-from
     * verify globbing support and security

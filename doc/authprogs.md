@@ -106,6 +106,10 @@ command line switches you provide.
 * `--dump_config`:
   Dump the configuration in a python-style view. Helpful only for debugging.
 
+* `--silent`:
+  Do not inform the user if their command has been rejected. Default is
+  to let them know it was rejected to prevent confusion.
+
 * `--help`:
   Show help information
 
