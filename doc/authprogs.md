@@ -18,7 +18,7 @@ an ssh server and decides if the command requested by the
 ssh client should be run or rejected based on logic in the `authprogs`
 configuration file.
 
-Passwordless SSH using ssh identies or pubkeys can enable all
+Passwordless SSH using ssh identities or pubkeys can enable all
 sorts of wonderful automation, for example running unattended
 batch jobs, slurping down backups, or pushing out code.
 Unfortunately a key, once trusted, is allowed by default to run
@@ -38,27 +38,27 @@ client IP, and such.
 
 ## KEY INSTALLATION
 
-You can install your ssh identities/pubkeys manually, or allow authprogs to do the work for you.
+You can install your ssh identities/pubkeys manually, or allow `authprogs` to do the work for you.
 
 ## MANUAL KEY INSTALLATION
 
 You need to set up your `~/.ssh/authorized_keys` file to force
-invocation of authprogs for the key or keys you wish to protect.
+invocation of `authprogs` for the key or keys you wish to protect.
 
 A line of an unrestricted `authorized_key` entry might look like this:
 
     ssh-rsa AAAAB3NzaC1yc2E.....OgQ7Pm1X8= user@example.com
 
-When setting up this key to use authprogs, you add a `command=` option
+When setting up this key to use `authprogs`, you add a `command=` option
 to the very beginning of that line that points to the location where
-authprogs lives. For example if authprogs is in /usr/bin/authprogs,
+authprogs lives. For example if `authprogs` is in `/usr/bin/authprogs`,
 you would use this:
 
     command="/usr/bin/authprogs --run" ssh-rsa AAAAB3NzaC1yc2E.....OgQ7Pm1X8= user@example.com
 
-You must include `--run` to let authprogs know it is running in SSH command mode.
+You must include `--run` to let `authprogs` know it is running in SSH command mode.
 
-Authprogs has other commandline options you may wish to include
+Authprogs has other command line options you may wish to include
 as well, for example
 
     command="/usr/bin/authprogs --keyname=backups --run" ssh-rsa AAAA...Pm1X8= user@example.com
@@ -76,8 +76,8 @@ See the sshd(8) man page for more information about allowed
 ## AUTOMATED KEY INSTALLATION
 
 Authprogs is capable of adding your key to your `authorized_keys`
-file (`~/.ssh/authorized_keys` by default) programatically. It
-also disableds ssh port forwarding by default for this key (a
+file (`~/.ssh/authorized_keys` by default) programmatically. It
+also disables ssh port forwarding by default for this key (a
 sensible default for most batch jobs.)
 
 authprogs will refuse to install a key that is already present
@@ -111,7 +111,7 @@ command line switches you provide.
 
 ## OTHER OPTIONS
 
-The folowing options may apply to multiple run modes, as appropriate.
+The following options may apply to multiple run modes, as appropriate.
 
 * `--keyname key_name`:
     This option 'names' the key, for help in
@@ -130,14 +130,14 @@ The folowing options may apply to multiple run modes, as appropriate.
     `key_name` may contain no whitespace.
 
 * `--configfile`:
-    Specifies the authprogs configuration file to read.
+    Specifies the `authprogs` configuration file to read.
     Defaults to `~/.ssh/authprogs.yaml`.
 
     In key installation mode, this adds the `--configfile`
     option to the `authorized_keys` entry.
 
 * `--configdir`:
-     Specifies the authprogs configuration, in which
+     Specifies the `authprogs` configuration, in which
      multiple configuration files can be found.
      Defaults to `~/.ssh/authprogs.d` if present.
 
@@ -157,10 +157,10 @@ Also, you cannot have spaces in any arguments your command runs.
 This is because the SSH server takes the command that was specified
 by the client and squashes it into the `SSH_ORIGINAL_COMMAND`
 variable. By doing this it makes it impossible for us to know
-what spaces in `SSH_ORIGINAL_COMAND` were between arguments and which
+what spaces in `SSH_ORIGINAL_COMMAND` were between arguments and which
 were part of arguments.
 
-Here are some commands that would not work through authprogs:
+Here are some commands that would not work through `authprogs`:
 
 * `ssh host "rm /tmp/foo; touch /tmp/success"`
 * `ssh host "rm /tmp/*.html"`
@@ -169,13 +169,13 @@ Here are some commands that would not work through authprogs:
 * `ssh host "for file in /tmp/*.html; do w3m -dump $file > $file.txt; done"`
 
 You can work around these limitations by writing a shell script that
-does what you need and calling that from authprogs, rather than attempting
-to run complicated commandlines via ssh directly.
+does what you need and calling that from `authprogs`, rather than attempting
+to run complicated command lines via ssh directly.
 
 ## CONFIGURATION FILES
 
 authprogs rules are maintained in one or more configuration files
-in YAML format. 
+in YAML format.
 
 The rules allow you to decide whether the client's command should be run
 based on criteria such as the command itself, the client IP address, and
@@ -188,7 +188,7 @@ you want to be able to easily add or remove rules without manually
 editing a single configuration file, such as when installing rules
 via your configuration tool of choice.
 
-All the authprogs configuration files are concatenated
+All the `authprogs` configuration files are concatenated
 together into one large yaml document which is then processed.
 The files are concatenated in the following order:
 
@@ -319,8 +319,8 @@ The command requested by the client is compared to the command
 listed in the rule. (Spaces are squashed together.) If it matches,
 then the command is run.
 
-Note that the command must be *exactly* the same; authprogs is not
-aware of arguments supported by a comamnd, so it cannot realize that
+Note that the command must be *exactly* the same; `authprogs` is not
+aware of arguments supported by a command, so it cannot realize that
 `"ls -la"` and `"ls -a -l"` and `"ls -al"` and `"ls -l -a"` are all the
 same. You can list multiple commands to allow you to accept
 variants of a command if necessary.
@@ -397,26 +397,26 @@ required to use this - you could use a simple command subrules
 to match explicit scp commands - but using an scp-specific
 subrule offers you greater flexibility.
 
-To trigger scp mode, use `rule_type: scp`.
+To specify scp mode, use `rule_type: scp`.
 
 The scp options are as follows.
 
 * `rule_type: scp`: This indicates that this is an scp subrule.
 
-* `allow_upload: true|false`:    Allow files to be uploaded to the ssh
+* `allow_upload: false|true`:    Allow files to be uploaded to the ssh
 server. Defaults to false.
 
-* `allow_download: true|false`:  Allow files to be downloaded from the
+* `allow_download: false|true`:  Allow files to be downloaded from the
 ssh server. Defaults to false.
 
-* `allow_recursion: true|false`:  Allow recursive (-r) file up/download.
+* `allow_recursion: false|true`:  Allow recursive (-r) file up/download.
 Defaults to false.
 
 * `allow_permissions: true|false`:  Allow scp to get/set the permissions
-of the file/files being transfered.  Defaults to false.
+of the file/files being transferred.  Defaults to false.
 
 * `files`:  The files option allows you to specify which file or files are
-allowed to be tranfered. If this is not specified then transfers are
+allowed to be transferred. If this is not specified then transfers are
 not restricted based on filename.
 
     Examples:
@@ -500,13 +500,13 @@ to find the error.
 ## FILES
 
 * `~/.ssh/authorized_keys`: The default place your key should be installed
-    and configured to call authprogs. The actual
+    and configured to call `authprogs`. The actual
     location can differ if your administrator
     has changed it.
 
-* `~/.ssh/authprogs.yaml`: Default authprogs configuration file. Override with --configfile.
+* `~/.ssh/authprogs.yaml`: Default `authprogs` configuration file. Override with --configfile.
 
-* `~/.ssh/authprogs.d`: Default authprogs configuration directory. Override with --configdir.
+* `~/.ssh/authprogs.d`: Default `authprogs` configuration directory. Override with --configdir.
 
 ## ENVIRONMENT
 
@@ -527,8 +527,16 @@ authenticated process
 
 ## EXIT STATUS
 
-authprogs returns 0 on success, non-zero on errors. In run mode it exits with
-the exit code of the command that was requested, or 126 on unexpected errors.
+On unexpected error or rejecting the command `authprogs` will exit 126.
+
+If the command was accepted then it returns the exit code of the command
+that was run.
+
+Note that if you're invoking ssh via another tool that program
+may provide a different exit status and provide a misleading
+error message when `authprogs` returns a failure, For example
+`rsync` will exit 12 and assume a "protocol problem" rather
+than a rejection on the server side.
 
 ## LOGGING AND DEBUGGING
 
@@ -537,14 +545,14 @@ mode and a line about each command that is attempted to be run
 will be written to it. The line itself is in the form of a python
 dictionary.
 
-If authprogs is run with `--debug`, then this logfile will get increased
+If `authprogs` is run with `--debug`, then this logfile will get increased
 debugging information, including the configuration, rule matching status
 as they are checked, etc.
 
 
 ## HISTORY
 
-A perl version of authprogs was originally published
+A perl version of `authprogs` was originally published
 at http://www.hackinglinuxexposed.com/articles/20030115.html
 in 2003. This is a complete rewrite in python, with a more
 extensible configuration, and avoiding some of the limitations
