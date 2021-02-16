@@ -549,6 +549,9 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
                     return match
 
         # No matches, time to give up.
+        sys.stderr.write(
+            'command "{}" rejected.\n'.format(self.original_command_string)
+        )
         raise CommandRejected(
             'command "{}" denied.'.format(self.original_command_string)
         )
