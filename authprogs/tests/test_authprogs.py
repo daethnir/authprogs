@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # vim: set ts=4 et
 """authprogs unit tests."""
 
@@ -18,13 +18,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    import StringIO as io
-except ImportError:
-    import io
-
 from authprogs import authprogs
 import unittest
+import io
 import os
 
 
