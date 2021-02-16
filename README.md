@@ -23,7 +23,7 @@ such as the command itself, the SSH key that was used, the
 client IP, and such.
 
 authprogs is enabled by using the command= option in the
-authorized_keys file.
+authorized\_keys file.
 
 Installation and Usage
 ======================
