@@ -15,39 +15,30 @@ from setuptools.command.install import install
 from setuptools.command.sdist import sdist
 
 
+# Allowed version list
+if sys.version_info < (3, 3):
+    sys.exit('Sorry, Python < 3.3 is not supported')
+
+
 # Documents that should be converted or renamed from markdown
 MARKDOWN2HTML = ['authprogs']
 MARKDOWN2TEXT = ['AUTHORS', 'INSTALL', 'README', 'TODO']
 
-if sys.version_info[0] == 2:
-    console_script = 'authprogs2'
-else:
-    console_script = 'authprogs'
+console_script = 'authprogs'
+
+
+def needsupdate(target, source):
+    uptodate = (
+        os.path.exists(target)
+        and os.stat(target).st_mtime >= os.stat(source).st_mtime
+    )
+    return not uptodate
 
 
 def long_description():
     """Read our long description from the fs."""
     with open('doc/description.rst') as filed:
         return filed.read()
-
-
-def runcmd(command, command_input=None, cwd=None):
-    """Run a command, potentially sending stdin, and capturing stdout/err."""
-    proc = subprocess.Popen(
-        command,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=cwd,
-    )
-    (stdout, stderr) = proc.communicate(command_input)
-    if proc.returncode != 0:
-        sys.stderr.write(
-            'ABORTING: command "{}" failed w/ code {}:\n'
-            '{}\n{}'.format(command, proc.returncode, stdout, stderr)
-        )
-        sys.exit(proc.returncode)
-    return proc.returncode, stdout, stderr
 
 
 class Converter(object):
@@ -69,7 +60,7 @@ class Converter(object):
 
         # Create manpage
         try:
-            if not os.path.exists(man_1):
+            if needsupdate(man_1, man_md):
                 shutil.copy(man_md, man_ronn)
                 self.created.append(man_ronn)
                 retval = subprocess.call(['ronn', '-r', man_ronn])
@@ -88,30 +79,30 @@ class Converter(object):
         # Markdown files in docs dir get converted to .html
         for name in MARKDOWN2HTML:
             htmlfile = os.path.join(doc, '{}.html'.format(name))
-            if os.path.exists(htmlfile):
+            source = os.path.join(doc, '{}.md'.format(name))
+            if not needsupdate(htmlfile, source):
                 continue
 
             target = open(htmlfile, 'w')
             self.created.append(htmlfile)
-            stdout = runcmd(
-                [
-                    'python',
-                    '-m',
-                    'markdown',
-                    os.path.join(doc, '{}.md'.format(name)),
-                ]
-            )[1]
-            if not stdout:
-                raise Exception('markdown conversion failed, no output.')
-            target.write(stdout)
+            command = ['python3', '-m', 'markdown', source]
+            proc = subprocess.run(
+                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
+            if proc.returncode != 0:
+                raise Exception(
+                    'Markdown conversion failed,'
+                    ' no output. {}'.format(proc.stderr.decode())
+                )
+            target.write(proc.stdout.decode())
             target.close()
 
         # Markdown files in top level just get renamed sans .md
         for name in MARKDOWN2TEXT:
             target = os.path.join(top, name)
-            if os.path.exists(target):
-                continue
             source = os.path.join(top, '{}.md'.format(target))
+            if not needsupdate(target, source):
+                continue
             shutil.copy(source, target)
             self.created.append(target)
 
