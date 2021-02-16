@@ -32,9 +32,7 @@ to kibbiz about implementation.
     * set environment variables
     * set `$PATH`
     * restrictions additions
-        * client IP matching changes
         * support for hostnames
-        * CIDR/netmask processing
         * time of day/week/etc
     * chroot to a different user via sudo before running
         * Would require your user has unrestricted sudo for this command
