@@ -41,14 +41,31 @@ to kibbiz about implementation.
     * case-insensitive pcre
     * whitespace support (clunky/worrisome)
     * shell regex command matching
-    * new smart command support
-        * rsync support
 
 * forced command specification
     * allow you to match a command and then run something completely different
 
 * ability to function as a login shell
     * would lose `--name` functionality
+
+* add --silent option to authprogs that prevents any
+  authprogs error message to user; make the default
+  behaviour inform the user when command is rejected.
+
+* rsync subrules
+    * investigate --include / --exclude / --files-from
+    * verify globbing support and security
+    * support uploading to file that does not exist
+      yet when using `files`. Currently it does a
+      realpath check which fails since the file
+      doesn't exist.
+    * add option that allows access to any
+      files under a given directory, rather than
+      being explicit
+    * create a cache for rsync\_realpaths to decrease
+      lookups when files are listed in multiple rules
+    * allow/disallow symlinks (-l)
+    * support setting allowed rsync binary paths
 
 * scp subrules
     * make scp handling check that the scp binary path is

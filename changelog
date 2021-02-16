@@ -1,3 +1,13 @@
+authprogs (0.7.0) testing; urgency=low
+  * initial rsync support
+
+ -- Bri Hatch <bri@ifokr.org>  Tue, 02 Feb 2021 18:00:00 -0800
+
+authprogs (0.6.1) stable; urgency=low
+  * Convert optparse to argparse
+
+ -- Bri Hatch <bri@ifokr.org>  Fri, 28 Feb 2019 18:00:00 -0800
+
 authprogs (0.6.0) stable; urgency=low
   * Add CIDR IP address matching (xdgc)
   * NFC code cleanup

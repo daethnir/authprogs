@@ -390,6 +390,358 @@ is performed.
             command: ^/bin/rm\\s+(-\\S+\\s+)*/var/tmp/\\S*$
             pcre_match: true
 
+## RSYNC SUBRULES
+
+authprogs has special support for rsync file transfer. You are not
+required to use this - you could use a simple command subrules
+to match explicit rsync commands - but using an rsync-specific
+subrule offers you greater flexibility.
+
+Rsync support is in beta, so please raise any bugs found. Supporting
+the full set of rsync command line options is a moving target.
+
+To specify rsync mode, use `rule_type: rsync`.
+
+The rsync options are as follows.
+
+* `rule_type: rsync`: This indicates that this is an rsync subrule.
+
+* `allow_upload: false|true`: Allow files to be uploaded to the ssh
+server. Defaults to false.
+
+* `allow_download: false|true`:  Allow files to be downloaded from the
+ssh server. Defaults to false.
+
+* `allow_archive: false|true`:  Allow file archive, i.e. the options
+  that are set when using `-a` or `--archive`. This is used to simplify
+  `authprogs` configuration files. Specifying this and negating one of
+  he associated options (e.g. `allow_recursive: false`) is considered
+  an error.  Defaults to false.
+
+* `paths`: a list of explicit files/directories that are allowed to match. Files
+  specified by the client will be resolved via `realpath` to avoid any
+  symlink trickery, so members of `paths` must be the real paths.
+
+  WARNING: specifying a directory in `paths` would allow rsync to
+  act on any files therein at potentially infinite depth, e.g. when
+  `allow_recursion` is set, or the client uses `--files-from`. If you
+  want to restrict to specific files you must name them explicitly.
+
+  See RSYNC SYMLINK SUPPORT for potential limitations to `paths`.
+
+* `path_startswith`: a list of pathname prefixes that are allowed to match.
+  Files specified by the client will be resolved via `realpath` and if they
+  start with the name provided then they will be allowed.
+
+  This is a simple prefix match. For example if you had
+
+        path_startswith: [ /tmp ]
+
+  then it would match all of the following
+
+        /tmp
+        /tmp/
+        /tmpfiles      # may not be what you meant!
+        /tmp/foo.txt
+        /tmp/dir1/dir2/bar.txt
+
+  If you want it to match only a directory (and any infinite subdirectories)
+  be sure to include a trailing slash, e.g. `/tmp/`
+
+  See RSYNC SYMLINK SUPPORT for potential limitations to `paths`.
+
+* `allow_acls: false|true`:  Allow syncing of file ACLs. (`--acls`). Defaults to false.
+
+* `allow_checksum: true|false`:  Allow checksum method for identifying files that need syncing. (`-c` / `--checksum`)  Defaults to true.
+
+* `allow_debug: true|false`: Allow fine-grained debug verbosity. (`--debug FLAGS`). No support for sanity
+checking the debug flags that are specified. Defaults to true.
+
+* `allow_delete: false|true`:  Allow any of the delete options. (`--del` `--delete` `--delete-after` `--delete-before` `--delete-delay` `--delete-during` `--delete-excluded` `--delete-missing-args`). Defaults to false.
+
+
+* `allow_devices: false|true`:  Allow syncing of device files. (`--devices`). Defaults to false.
+
+* `allow_group: false|true`:  Allow group change. (`-g --group`). Defaults to false.
+
+* `allow_info: true|false`: Allow fine-grained info verbosity. (`-info FLAGS`). No support for sanity
+checking the info flags that are specified. Defaults to true.
+
+* `allow_links: false|true`:  Allow copying symlinks as symlinks. (`-l --links`). Defaults to false.
+
+* `allow_group: false|true`:  Allow ownership change. (`-o --owner`). Defaults to false.
+
+* `allow_perms: false|true`:  Allow perms change. (`-p --perms`). Defaults to false.
+
+* `allow_recursive: false|true`:  Allow recursive sync. (`-r --recursive`). Defaults to false.
+
+* `allow_specials: false|true`:  Allow syncing of special files, e.g. fifos. (`--specials`). Defaults to false.
+
+* `allow_times: true|false`:  Allow setting synced file times. (`-t --times`). Defaults to true.
+
+* `allow_verbose: true|false|#`:  Allow verbose output. (`-v --verbose`). Rsync allows multiple
+-v options, so this option accepts true (allow any verbosity), false (deny any verbosity), or a number
+which indicates the maximum number of `-v` option that are allowed, e.g. `2` would allow `-v` or `-vv` but
+not `-vvv`.  Defaults to true.
+
+
+
+
+### RSYNC COMMAND LINE OPTIONS
+
+Not all rsync options are currently implemented in `authprogs`.
+
+If an option is listed as "<not implemented>" then there are two possibilities
+in how `authprogs` will behave:
+
+    * if the option is no actually sent on the remote command line then
+      `authprogs` is blissfully unaware and the command will succeed.
+      Many options are actually client-side only. We have not thoroughly
+      investigated every single option yet.
+
+    * if the option is sent on the remote command line then `authprogs`
+      will fail.
+
+Here is the list of rsync options and their current `authprogs` support status:
+
+
+    rsync client arg             authprogs support
+    ----------------             -----------------
+
+        --append                   <not implemented>
+        --append-verify            <not implemented>
+        --backup-dir               <not implemented>
+        --bwlimit                  <not implemented>
+        --checksum-seed            <not implemented>
+        --chown                  converted to --usermap and --groupmap
+        --compare-dest             <not implemented>
+        --compress-level           <not implemented>
+        --contimeout               <not implemented>
+        --copy-dest                <not implemented>
+        --copy-unsafe-links        <not implemented>
+        --debug                  allow_debug
+        --del                    allow_delete
+        --delay-updates            <not implemented>
+        --delete                 allow_delete
+        --delete-after           allow_delete
+        --delete-before          allow_delete
+        --delete-delay           allow_delete
+        --delete-during          allow_delete
+        --delete-excluded        allow_delete
+        --delete-missing-args    allow_delete
+        --devices                allow_devices
+        --existing                 <not implemented>
+        --fake-super               <not implemented>
+        --files-from               <not implemented>
+        --force                    <not implemented>
+        --groupmap                 <not implemented>
+        --iconv                    <not implemented>
+        --ignore-errors            <not implemented>
+        --ignore-existing          <not implemented>
+        --ignore-missing-args      <not implemented>
+        --info                   allow_info
+        --inplace                  <not implemented>
+        --link-dest                <not implemented>
+        --list-only                <not implemented>
+        --log-file                 <not implemented>
+        --log-file-format          <not implemented>
+        --max-delete               <not implemented>
+        --max-size                 <not implemented>
+        --min-size                 <not implemented>
+        --new-compress             <not implemented>
+        --no-XXXXX                 <not implemented> (negating options, e.g. --no-r)
+        --numeric-ids              <not implemented>
+        --only-write-batch         <not implemented>
+        --outbuf                   <not implemented>
+        --partial                  <not implemented>
+        --partial-dir              <not implemented>
+        --preallocate              <not implemented>
+        --protocol                 <not implemented>
+        --read-batch               <not implemented>
+        --remove-sent-files        <not implemented> # deprecated version of remove-source-files
+        --remove-source-files      <not implemented>
+        --safe-links               <not implemented>
+        --size-only                <not implemented>
+        --skip-compress            <not implemented>
+        --specials               allow_specials
+        --stats                    <not implemented>
+        --stop-at                  <not implemented>
+        --suffix                   <not implemented>
+        --super                    <not implemented>
+        --time-limit               <not implemented>
+        --timeout                  <not implemented>
+        --usermap                  <not implemented>
+        --write-batch              <not implemented>
+    -0, --from0                    <not implemented>
+    -@, --modify-window            <not implemented>
+    -A, --acls                   allow_acls
+    -B, --block-size               <not implemented>
+    -C, --cvs-exclude              <not implemented>
+    -D                           allow_devices and allow_specials
+    -E, --executability            <not implemented>
+    -H, --hard-links               <not implemented>
+    -I, --ignore-times             <not implemented>
+    -J, --omit-link-times          <not implemented>
+    -K, --keep-dirlinks            <not implemented>
+    -L, --copy-links               <not implemented>
+    -O, --omit-dir-times           <not implemented>
+    -P                           Same as --partial --progress
+    -R, --relative                 <not implemented>
+    -S, --sparse                   <not implemented>
+    -T, --temp-dir                 <not implemented>
+    -W, --whole-file               <not implemented>
+    -X, --xattrs                   <not implemented>
+    -a, --archive                Same as -rlptgoD; See those options
+        --progress                 <not implemented>
+    -b, --backup                   <not implemented>
+    -c, --checksum               allow_checksum
+    -d, --dirs                     <not implemented>
+    -f, --filter                   <not implemented>
+    -g, --group                  allow_group
+    -i, --itemize-changes          <not implemented>
+    -k, --copy-dirlinks            <not implemented>
+    -l, --links                  allow_links
+    -m, --prune-empty-dirs         <not implemented>
+    -n, --dry-run                  <not implemented>
+    -o, --owner                  allow_owner
+    -p, --perms                  allow_perms
+    -r, --recursive              allow_recursive
+    -s, --protect-args             <not implemented>
+    -t, --times                  allow_times
+    -u, --update                   <not implemented>
+    -v, --verbose                allow_verbose
+    -x, --one-file-system          <not implemented>
+    -y, --fuzzy                    <not implemented>
+    -z, --compress                 <not implemented>
+        --checksum-choice=STR      <not implemented>
+        --exclude-from             <not implemented>
+        --exclude                  <not implemented>
+        --include-from             <not implemented>
+        --include                  <not implemented>
+        --rsync-path               <not implemented>
+        --out-format               <not implemented>
+
+The following are server-side only options that are supported
+
+    -e, --rsh=COMMAND            Value ignored (indicates protocol feature support)
+    --sender                     When present means download from server,
+                                 when absent means upload to server.
+    --server                     Always present on server
+
+
+The following rsync client options are only relevant to daemon mode (i.e.
+rsync daemon listening on TCP directly without SSH) or do not end up
+on the server command line and are thus re not taken into consideration
+when determining if the command is or is not allowed:
+
+        --address               Client-only option
+        --chmod                 Client-only option
+                                   (Permissions are indicated via rsync
+                                    protocol, not command line flags.)
+        --blocking-io           Client-only option
+        --daemon                Daemon-only option
+        --msgs2stderr           Client-only option
+        --munge-links           Client-only option
+        --no-motd               Client-only option
+        --noatime               Client-only option
+        --password-file         Daemon-only option
+        --port                  Client-only option
+        --sockopts              Daemon-only option
+        --version               Client-only option
+    -4, --ipv4                  Client-only option
+    -6, --ipv6                  Client-only option
+    -8, --8-bit-output          Client-only option
+    -F                          Client-only option (see --filter)
+    -M, --remote-option=OPTION  Client-only option
+    -h, --human-readable        Client-only option
+    -q, --quiet                 Client-only option
+
+
+### RSYNC BINARY PATH
+
+Rsync must be at an official path to prevent a user's environment from
+choosing one of their programs over the official one. Official paths are
+
+    * /usr/bin/rsync
+    * /usr/local/bin/rsync
+
+A user who specifies --rsync-path with a different value, or who has
+an rsync program earlier in their $PATH will be denied.
+
+### RSYNC SYMLINK SUPPORT
+
+Rsync has multiple ways of handling symlinks depending on command line
+parameters and what component(s) of a path are symlinks.
+
+If you are using `paths` or `paths_startswith` to limit what files
+may be uploaded/downloaded then its your responsibility to assure
+that symlink games are not used to exceed the desired restrictions.
+
+For example if the file `/tmp/me.txt` is a symlink to `/home/wbagg/me.txt`
+and you had
+
+    - rule\_type: rsync
+        allow_upload: true
+        paths:
+            - /tmp/me.txt
+
+then if the user ran
+
+    rsync /some/local/file remote:/tmp/me.txt
+
+then rather than updating the file at `/home/wbagg.me.txt`, the
+symlink at `/tmp/me.txt` would be replaced with a normal file.
+
+A future update to `authprogs` may attempt to handle symlinks by
+calling `os.path.realpath` prior to doing comparisons.
+
+
+### RSYNC PATHNAME GOTCHA
+
+Say you wanted to restrict uploads to just the file `/tmp/foo.txt`, you'd
+use the following rsync subrule::
+
+    - rule\_type: rsync
+      allow_upload: true
+      paths:
+        - /tmp/foo.txt
+
+From an end-user perspective both of these commands would seem to be
+allowed from the client machine because they'd create a file on
+the remote named `/tmp/foo.txt`:
+
+    $ rsync foo.txt remote:/tmp/foo.txt  # provide full target filename
+    $ rsync foo.txt remote:/tmp          # imply source name for target
+
+However you'll find that only the first one works! This is because
+`authprogs` on the server side sees literally just `/tmp` in the second
+case.
+
+Thus if you wanted to restrict uploads to just the file `/tmp/foo.txt`
+then on the client side you **must** run the first (explicit
+filename) rsync command.
+
+### RSYNC SUBRULE KNOWN AND POSSIBLE BUGS
+
+* If uploading to a file that does not yet exist when you've
+  set `paths` this will fail. Adding a new `allow_create` option
+  is the most likely solution here, but not yet implemented.
+
+* No investigation of the rsync options --include / --exclude / --files-from
+  has yet been performed - may affect path matching security.
+
+* Though we do expand file globs and check each individual path
+  that is returned, we do not explicitly use these resolved
+  files when calling rsync. (Reason: it's possible we exceed the
+  allowed size of a command line with globs that return many files.)
+  As such if rsync's glob and `shutils.glob` have different behaviour
+  we may have false positives or negatives.
+
+* When `allow_download` is disabled client should not be able to get file
+  contents. However since rsync transfers checksums as part of its protocol
+  it is possible that information about server file contents could be gleaned
+  by comparing checksums to possible content checksums when doing uploads.
+
 ## SCP SUBRULES
 
 authprogs has special support for scp file transfer. You are not
@@ -488,6 +840,32 @@ Note that this config can be spread around between the
             - /srv/backups/host1.tgz
             - /srv/backups/host2.tgz
             - /srv/backups/host3.tgz
+
+        # Allow rsync to upload everything, deny any download
+        - rule_type: rsync
+          allow_upload: true
+
+        # Allow rsync to recursively sync /tmp/foo/ to the server
+        # but do not allow download
+        - rule_type: rsync
+          allow_upload: true
+          allow_recursion: true
+          files:
+            - /tmp/foo
+
+        # Allow rsync to write some specific files and any individual
+        #   files under /data/lhc directory, such as /data/lhc/foo
+        #   or /data/lhc/subdir/foo.
+        # Disallow download (explicitly listed) or recursive
+        #    upload (default false).
+        - rule_type: rsync
+          allow_upload: true
+          allow_download: false
+          paths:
+            - /srv/htdocs/index.html
+            - /srv/htdocs/status.html
+          path_startswith:
+            - /data/lhc
 
 
 ## TROUBLESHOOTING

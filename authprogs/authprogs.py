@@ -26,7 +26,10 @@ try:
 except ImportError:
     import io
 
+from . import rsync as rsync_checker
+
 import argparse
+import glob
 import os
 import pprint
 import re
@@ -143,6 +146,9 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         self.configfile = configfile
         self.configdir = configdir
 
+        self.subvalidators = {}
+        self.subvalidators['rsync'] = rsync_checker.RsyncValidator(self)
+
     def __del__(self):
         if self.logfh:
             self.logfh.close()
@@ -185,6 +191,68 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         """Log information."""
         if self.logfh:
             self.logfh.write(message)  # pylint: disable-msg=E1103
+
+    def _glob(self, path):
+        """Return glob results of path, or original if no match
+
+        glob.glob returns a list only if there are actual matching files.
+        So we always return the original if glob doesn't succeed
+        so we can create files that don't yet exist, etc.
+
+        Mocked out in unit tests, silly otherwise.
+        """
+        results = glob.glob(path)
+        return glob.glob(path) or path
+
+    def _os_path_abspath(self, path):
+        """Return abspath of path
+
+        Mocked out in unit tests, silly otherwise.
+        """
+        return os.path.abspath(path)
+
+    def _os_path_expanduser(self, path):
+        """Return pathname with ~ expansions.
+
+        Mocked out in unit tests, silly otherwise.
+        """
+        return os.path.expanduser(path)
+
+    def _os_path_realpath(self, path):
+        """Return canonical pathname.
+
+        Mocked out in unit tests, silly otherwise.
+        """
+        return os.path.realpath(path)
+
+    def globpaths(self, path, expanduser=False, realpath=False):
+        """Return paths for given file name after glob expansion.
+
+        If expanduser is set then expand ~ to current user's home dir
+        If realpath is set then convert to real path after resolving symlinks
+        Always calls abspath to create a path that starts at / and resolve ..
+
+        Perform glob expansion of name and returns list of canonicalized
+        file names
+        """
+        path = self._os_path_abspath(path)
+
+        if expanduser:
+            path = self._os_path_expanduser(path)
+
+        if realpath:
+            path = self.realpath(path)
+
+        paths = self._glob(path)
+
+        return paths
+
+    def realpath(self, path):
+        """Return the real path for the given file path.
+
+        Returns canonicalized file name (eliminate symlinks, handle '..')
+        """
+        return self._os_path_realpath(path)
 
     def check_keyname(self, rule):
         """If a key name is specified, verify it is permitted."""
@@ -348,6 +416,12 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         target_fd = os.open(authorized_keys, os.O_RDWR | os.O_CREAT, 0o600)
         self.install_key_data(keydata, os.fdopen(target_fd, 'w+'))
 
+    def find_match_rsync(self, rule):  # pylint: disable-msg=R0911,R0912
+        """Handle rsync commands."""
+        return self.subvalidators['rsync'].validate_command(
+            self.original_command_list[:], rule
+        )
+
     def find_match_scp(self, rule):  # pylint: disable-msg=R0911,R0912
         """Handle scp commands."""
 
@@ -460,6 +534,8 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
                     sub = self.find_match_command
                 elif rule_type == 'scp':
                     sub = self.find_match_scp
+                elif rule_type == 'rsync':
+                    sub = self.find_match_rsync
                 else:
                     self.log(
                         'fatal: no such rule_type "{}"\n'.format(rule_type)

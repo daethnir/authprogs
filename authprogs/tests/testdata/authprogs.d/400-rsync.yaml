@@ -1,0 +1,236 @@
+# There are intentionally multiple 0.1.0.0 rules.
+# The first should not match, the last always does.
+# This assures we have tests that hit the rsync
+# rule multiple times and our rsync subvalidator
+# object is handled properly
+-
+    from: 0.1.0.0
+    allow:
+        rule_type: rsync
+        paths:
+            - /etc/hostname
+        allow_verbose: false
+        allow_upload: false
+        allow_download: false
+        allow_recursive: false
+
+# Allow all rule for 0.1.0.0
+-
+    from: 0.1.0.0
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_download: true
+        allow_recursive: true
+-
+    from: 0.1.0.1
+    allow:
+        rule_type: rsync
+        allow_verbose: true
+        allow_upload: true
+        allow_download: true
+-
+    from: 0.1.0.2
+    allow:
+        rule_type: rsync
+        allow_verbose: false
+        allow_upload: true
+        allow_download: true
+-
+    from: 0.1.0.3
+    allow:
+        rule_type: rsync
+        allow_download: false
+        allow_upload: true
+-
+    from: 0.1.0.4
+    allow:
+        rule_type: rsync
+        allow_upload: false
+        allow_download: true
+
+-
+    from: 0.1.0.5
+    allow:
+        rule_type: rsync
+        allow_upload: false
+        allow_download: false
+
+-
+    from: 0.1.0.6
+    allow:
+        rule_type: rsync
+        allow_recursive: false
+        allow_upload: true
+        allow_download: true
+
+-
+    from: 0.1.0.7
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_download: true
+        paths:
+            - /etc/group
+            - /globs/dir1
+            - /globs/dir2
+            - /globs/subs/dir1
+            - /globs/subs/dir1
+            - /home/groot/bin/authprogs
+            - /home/wbagg/.profile # specified via various methods
+            - /run/foo.pid
+            - /var   # as a whole dir, not subdir, test w/o trailing slash
+            - /tmp/  # as a whole dir, not subdir, test with trailing slash
+        path_startswith:
+            - /data/lhc
+            - /globs/subs/dir3
+            - /globs/subs/dir4
+            - /proc/sys/
+            - /usr/share/zoneinfo
+
+-  # test_recursive_and_delete
+    from: 0.1.0.8
+    allow:
+        rule_type: rsync
+        allow_recursive: true
+        allow_upload: true
+
+-  # test_recursive_and_delete
+    from: 0.1.0.9
+    allow:
+        rule_type: rsync
+        allow_delete: true
+        allow_recursive: true
+        allow_upload: true
+
+
+-  # test_buncha_bools
+    from: 0.1.0.10
+    allow:
+        rule_type: rsync
+        allow_upload: true
+
+
+-  # test_buncha_bools
+    from: 0.1.0.11
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_devices: true
+
+-  # test_buncha_bools
+    from: 0.1.0.12
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_specials: true
+
+-  # test_buncha_bools
+    from: 0.1.0.13
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_acls: true
+
+-  # test_buncha_bools
+    from: 0.1.0.14
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_group: true
+
+-  # test_buncha_bools
+    from: 0.1.0.15
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_links: true
+
+-  # test_buncha_bools
+    from: 0.1.0.16
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_owner: true
+
+-  # test_buncha_bools
+    from: 0.1.0.17
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_perms: true
+
+-  # test_buncha_bools
+    from: 0.1.0.18
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_times: false
+
+-  # test_buncha_bools
+    from: 0.1.0.19
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_recursive: true
+
+-  # test_buncha_bools
+    from: 0.1.0.20
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_checksum: false
+
+-  # test_buncha_bools
+    from: 0.1.0.21
+    allow:
+        rule_type: rsync
+        allow_upload: true
+        allow_delete: true
+-
+    from: 0.1.0.22
+    allow:
+        rule_type: rsync
+        allow_verbose: false
+        allow_upload: true
+        allow_download: true
+
+-
+    from: 0.1.0.23
+    allow:
+        rule_type: rsync
+        allow_info: false
+        allow_upload: true
+        allow_download: true
+
+-
+    from: 0.1.0.24
+    allow:
+        rule_type: rsync
+        allow_debug: false
+        allow_upload: true
+        allow_download: true
+
+-
+    from: 0.1.0.25
+    allow:
+        rule_type: rsync
+        allow_verbose: 2
+        allow_upload: true
+        allow_download: true
+
+
+-
+    from: 0.1.0.26
+    allow:
+        rule_type: rsync
+        allow_archive: true
+        allow_upload: true
+
+-   # Broken rule - can't use allow_archive and expanded bits
+    from: 0.1.0.27
+    allow:
+        rule_type: rsync
+        allow_archive: true
+        allow_times: false
+        allow_upload: true
