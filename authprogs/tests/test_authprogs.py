@@ -299,6 +299,17 @@ class AuthProgsTests(unittest.TestCase):
         ap = getap('0.0.0.8', 'scp -d -t /etc/passwd')
         self.assertRaises(authprogs.CommandRejected, ap.find_match)
 
+    def test_sneaky_args_scp(self):
+        """Verify SCP rejects attempts to sneak args past it"""
+
+        # sneak past checks via option grouping
+        ap = getap('0.0.0.8', 'scp -df /etc/passwd')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+
+        # run a command via -S
+        ap = getap('0.0.0.8', 'scp -S /path/to/a/program /tmp/foo example.com:.')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+
     def test_recursive_scp(self):
         """Verify recursive tests pass/fail as expected."""
         ap = getap('0.0.0.7', 'scp -r -t -- /tmp')
