@@ -850,16 +850,19 @@ Note that this config can be spread around between the
           allow_upload: true
 
         # Allow rsync to recursively sync /tmp/foo/ to the server
+        # in archive mode (-a, or any subset of -logptrD)
         # but do not allow download
         - rule_type: rsync
           allow_upload: true
           allow_recursion: true
-          files:
+          allow_archive: true
+          paths:
             - /tmp/foo
 
         # Allow rsync to write some specific files and any individual
-        #   files under /data/lhc directory, such as /data/lhc/foo
+        #   files under /data/lhc/ directory, such as /data/lhc/foo
         #   or /data/lhc/subdir/foo.
+        #
         # Disallow download (explicitly listed) or recursive
         #    upload (default false).
         - rule_type: rsync
@@ -869,7 +872,7 @@ Note that this config can be spread around between the
             - /srv/htdocs/index.html
             - /srv/htdocs/status.html
           path_startswith:
-            - /data/lhc
+            - /data/lhc/
 
 
 ## TROUBLESHOOTING
