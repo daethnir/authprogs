@@ -1,3 +1,8 @@
+authprogs (0.7.3) testing; urgency=low
+    * Update documentation, spell check, and other non-functional changes
+
+ -- Bri Hatch <bri@ifokr.org>  Tue, 21 Feb 2021 21:00:00 -0800
+
 authprogs (0.7.2) testing; urgency=critical
     * deprecate allow_recursion in favour of allow_recursive for scp
     * deprecate files in favour of paths for scp
