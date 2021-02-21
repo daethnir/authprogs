@@ -236,7 +236,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         If realpath is set then convert to real path after resolving symlinks
         Always calls abspath to create a path that starts at / and resolve ..
 
-        Perform glob expansion of name and returns list of canonicalized
+        Perform glob expansion of name and returns list of canonicalised
         file names
         """
         path = self._os_path_abspath(path)
@@ -254,7 +254,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
     def realpath(self, path):
         """Return the real path for the given file path.
 
-        Returns canonicalized file name (eliminate symlinks, handle '..')
+        Returns canonicalised file name (eliminate symlinks, handle '..')
         """
         return self._os_path_realpath(path)
 

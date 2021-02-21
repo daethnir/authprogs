@@ -266,7 +266,7 @@ class RsyncTests(unittest.TestCase):
         )
 
     def test_limit_recursive(self):
-        """Verify we can selectively prevent recusive file transfer."""
+        """Verify we can selectively prevent recursive file transfer."""
         self.command_allowed('0.1.0.6', 'rsync --server    -e.LsfxC . /tmp/')
         self.command_rejected('0.1.0.6', 'rsync --server -r -e.LsfxC . /tmp/')
         self.command_rejected('0.1.0.6', 'rsync --server -re.LsfxC . /tmp/')
@@ -297,7 +297,7 @@ class RsyncTests(unittest.TestCase):
         self.assertRaises(authprogs.ConfigError, ap.find_match)
 
     def test_recursive_and_delete(self):
-        """Verify we can support delete and recusive file transfer."""
+        """Verify we can support delete and recursive file transfer."""
         self.command_allowed('0.1.0.8', 'rsync --server -re.iLsfxC . /tmp/')
         self.command_rejected(
             '0.1.0.8', 'rsync --delete --server -re.LsfxC . /tmp/'
