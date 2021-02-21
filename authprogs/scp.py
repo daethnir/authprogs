@@ -124,8 +124,17 @@ class ScpValidator(object):
                 self.log('scp denied - set/getting permissions forbidden.\n')
                 return
 
-        if rule.get('files'):
-            files = rule.get('files')
+        if 'files' in rule:
+            self.log(
+                'WARNING: deprecated option "files" set in rule.'
+                ' Update to paths.\n'
+            )
+            if 'paths' in rule:
+                rule['paths'].extend(rule['files'])
+            else:
+                rule['paths'] = rule['files']
+        if rule.get('paths'):
+            files = rule.get('paths')
             if not isinstance(files, list):
                 files = [files]
             if filepath not in files:

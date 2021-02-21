@@ -506,6 +506,16 @@ class AuthProgsTests(unittest.TestCase):
             authprogs.InstallError, ap.install_key_data, keydata, thefile
         )
 
+    def test_deprecated_scp_files_option(self):
+        """Verify files is still supported, merged with paths."""
+        # Can download some files
+        ap = getap('0.0.0.15', 'scp -f -- /etc/passwd')
+        ap.find_match()
+        ap = getap('0.0.0.15', 'scp -f -- /etc/aliases')
+        ap.find_match()
+        ap = getap('0.0.0.15', 'scp -f -- /etc/foo')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+
     def test_files_scp(self):
         """Verify we can restrict file/paths."""
 
