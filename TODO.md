@@ -26,6 +26,7 @@ to kibbiz about implementation.
       installing keys
     * command line option for authprogs path
     * identify installation attempt of private keys
+    * add 'restrict' to the pubkey entry if supported by the version of sshd
 
 * config rules improvements
     * chdir to a directory before running
@@ -48,7 +49,7 @@ to kibbiz about implementation.
 * ability to function as a login shell
     * would lose `--name` functionality
 
-* rsync subrules
+* rsync support
     * investigate --include / --exclude / --files-from
     * verify globbing support and security
     * support uploading to file that does not exist
@@ -62,10 +63,12 @@ to kibbiz about implementation.
       lookups when files are listed in multiple rules
     * allow/disallow symlinks (-l)
     * support setting allowed rsync binary paths
+    * replace rsync path with discovered path prior to
+      running command - will help avoid a timing attack
+      if an rsync binary is found in $PATH between check
+      and exec.
 
-* scp subrules
-    * make scp handling check that the scp binary path is
-      valid so to avoid any $PATH trickery, similar to how
-      its done in rsync
-    * support for `-v`
+* scp support
     * support for `-d` (targetshouldbedirectory)
+    * mock out shutils.which in unit tests to remove
+      dependency on locally-installed scp binary

@@ -1,3 +1,16 @@
+authprogs (0.7.2) testing; urgency=critical
+    * deprecate allow_recursion in favour of allow_recursive for scp
+    * deprecate files in favour of paths for scp
+    * do proper argparse parsing of scp command line
+    * prevent shell escape when using 'scp -S' - thanks to
+      Nick Cleaton for identifying this risk.
+    * remove '-h' option from rsync accidentally inherited from
+      argparse parsing
+    * require scp is one of the well known paths - 'scp' is
+      no longer sufficient
+
+ -- Bri Hatch <bri@ifokr.org>  Tue, 21 Feb 2021 19:00:00 -0800
+
 authprogs (0.7.1) testing; urgency=low
   * add --silent option
 
