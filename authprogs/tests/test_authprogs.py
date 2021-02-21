@@ -264,13 +264,15 @@ class AuthProgsTests(unittest.TestCase):
         )
         ap = getap('0.0.0.6', 'scp -f -- /etc/passwd')
         self.assertEqual(
-            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '--', '/etc/passwd']}
+            ap.find_match(),
+            {'command': ['/usr/bin/scp', '-f', '--', '/etc/passwd']},
         )
 
         # Bundling good here
         ap = getap('0.0.0.6', 'scp -d -f /etc/passwd')
         self.assertEqual(
-            ap.find_match(), {'command': ['/usr/bin/scp', '-d', '-f', '/etc/passwd']}
+            ap.find_match(),
+            {'command': ['/usr/bin/scp', '-d', '-f', '/etc/passwd']},
         )
         ap = getap('0.0.0.6', 'scp -df /etc/passwd')
         self.assertEqual(
@@ -292,7 +294,8 @@ class AuthProgsTests(unittest.TestCase):
         )
         ap = getap('0.0.0.9', 'scp -f -d /etc/passwd')
         self.assertEqual(
-            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '-d', '/etc/passwd']}
+            ap.find_match(),
+            {'command': ['/usr/bin/scp', '-f', '-d', '/etc/passwd']},
         )
         ap = getap('0.0.0.9', 'scp -f -r /etc/passwd')
         self.assertRaises(authprogs.CommandRejected, ap.find_match)
@@ -365,8 +368,7 @@ class AuthProgsTests(unittest.TestCase):
         # run a command via -S
         ap = getap('0.0.0.6', 'scp -t /etc/passwd')
         self.assertEqual(
-            ap.find_match(),
-            {'command': ['/usr/bin/scp', '-t', '/etc/passwd']},
+            ap.find_match(), {'command': ['/usr/bin/scp', '-t', '/etc/passwd']}
         )
 
         ap = getap('0.0.0.8', 'scp -t -S /path/to/a/program /etc/passwd')

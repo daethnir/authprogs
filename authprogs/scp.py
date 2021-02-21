@@ -106,11 +106,14 @@ class ScpValidator(object):
                 'WARNING: deprecated option "allow_recursion" set in rule.'
                 ' Update to allow_recursive.\n'
             )
-            vals = set([rule.get('allow_recursive'), rule.get('allow_recursion')])
+            vals = set(
+                [rule.get('allow_recursive'), rule.get('allow_recursion')]
+            )
             if True in vals and False in vals:
                 self.log(
                     'CRITICAL: both allow_recursive and allow_recursion are set,'
-                    ' but to different values. Skipping bad rule.\n')
+                    ' but to different values. Skipping bad rule.\n'
+                )
                 return
             if 'allow_recursive' not in rule:
                 rule['allow_recursive'] = rule['allow_recursion']
@@ -152,13 +155,17 @@ class ScpValidator(object):
 
         self.parser = ArgumentParserWrapper(add_help=False)
 
-        self.parser.add_argument('-d', action='store_true', dest='targetshouldbedirectory')
+        self.parser.add_argument(
+            '-d', action='store_true', dest='targetshouldbedirectory'
+        )
         self.parser.add_argument('-f', action='store_true', dest='download')
         self.parser.add_argument('-t', action='store_true', dest='upload')
         self.parser.add_argument('-r', action='store_true', dest='recursive')
         self.parser.add_argument('-p', action='store_true', dest='permissions')
         self.parser.add_argument('-v', action='store_true', dest='verbose')
-        self.parser.add_argument('-S', action='store_true', dest='authprogs_reject')
+        self.parser.add_argument(
+            '-S', action='store_true', dest='authprogs_reject'
+        )
         self.parser.add_argument('extra', nargs='*')
 
         try:
