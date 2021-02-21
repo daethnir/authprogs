@@ -70,29 +70,56 @@ class ScpValidator(object):
         if not command:
             return
 
-        # orig_args = command[1:]
-        # args = self.parse_args(orig_args)
+        args = self.parse_args(command[1:])
+        if len(args.extra) != 1:
+            self.log('scp cmdline parsing expecting exactly one path.')
+            return
 
-        binary = orig_list.pop(0)
-        filepath = orig_list.pop()
-        arguments = orig_list
+        if args.authprogs_reject:
+            return
+        filepath = args.extra[0]
 
-        if '-f' in arguments:
+        if args.download and args.upload:
+            self.logdebug(
+                'client scp requested upload and download'
+                ' simultaneously - rejecting.'
+            )
+            return
+        if not (args.download or args.upload):
+            self.logdebug(
+                'client scp requested neither upload nor download'
+                ' - rejecting.'
+            )
+
+        if args.download:
             if not rule.get('allow_download'):
                 self.logdebug('scp denied - downloading forbidden.\n')
                 return
 
-        if '-t' in arguments:
+        if args.upload:
             if not rule.get('allow_upload'):
                 self.log('scp denied - uploading forbidden.\n')
                 return
 
-        if '-r' in arguments:
-            if not rule.get('allow_recursion'):
+        if 'allow_recursion' in rule:
+            self.log(
+                'WARNING: deprecated option "allow_recursion" set in rule.'
+                ' Update to allow_recursive.\n'
+            )
+            vals = set([rule.get('allow_recursive'), rule.get('allow_recursion')])
+            if True in vals and False in vals:
+                self.log(
+                    'CRITICAL: both allow_recursive and allow_recursion are set,'
+                    ' but to different values. Skipping bad rule.\n')
+                return
+            if 'allow_recursive' not in rule:
+                rule['allow_recursive'] = rule['allow_recursion']
+        if args.recursive:
+            if not rule.get('allow_recursive'):
                 self.log('scp denied - recursive transfers forbidden.\n')
                 return
 
-        if '-p' in arguments:
+        if args.permissions:
             if not rule.get('allow_permissions', 'true'):
                 self.log('scp denied - set/getting permissions forbidden.\n')
                 return
@@ -110,3 +137,24 @@ class ScpValidator(object):
 
         # Allow it!
         return {'command': command}
+
+    def parse_args(self, args):
+        """Parse scp args."""
+
+        self.parser = ArgumentParserWrapper(add_help=False)
+
+        self.parser.add_argument('-d', action='store_true', dest='targetshouldbedirectory')
+        self.parser.add_argument('-f', action='store_true', dest='download')
+        self.parser.add_argument('-t', action='store_true', dest='upload')
+        self.parser.add_argument('-r', action='store_true', dest='recursive')
+        self.parser.add_argument('-p', action='store_true', dest='permissions')
+        self.parser.add_argument('-v', action='store_true', dest='verbose')
+        self.parser.add_argument('-S', action='store_true', dest='authprogs_reject')
+        self.parser.add_argument('extra', nargs='*')
+
+        try:
+            scp_args = self.parser.parse_args(args)
+        except Exception as err:
+            self.log('authprogs.scp command parser failed: {}.\n'.format(err))
+            raise ParserError('authprogs.scp parser failure: {} '.format(err))
+        return scp_args

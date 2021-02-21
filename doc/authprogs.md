@@ -760,20 +760,23 @@ The scp options are as follows.
 * `rule_type: scp`: This indicates that this is an scp subrule.
 
 * `allow_upload: false|true`:    Allow files to be uploaded to the ssh
-server. Defaults to false.
+  server. Defaults to false.
 
 * `allow_download: false|true`:  Allow files to be downloaded from the
-ssh server. Defaults to false.
+  ssh server. Defaults to false.
 
-* `allow_recursion: false|true`:  Allow recursive (-r) file up/download.
-Defaults to false.
+* `allow_recursive: false|true`:  Allow recursive (-r) file up/download.
+  Defaults to false.
+
+* `allow_recursion: false|true`:  Deprecated version of `allow_recursive`.
+  will be removed in 1.0 release.
 
 * `allow_permissions: true|false`:  Allow scp to get/set the permissions
-of the file/files being transferred.  Defaults to false.
+  of the file/files being transferred.  Defaults to false.
 
-* `files`:  The files option allows you to specify which file or files are
-allowed to be transferred. If this is not specified then transfers are
-not restricted based on filename.
+* `paths`:  The paths option allows you to specify which file or files are
+  allowed to be transferred. If this is not specified then transfers are
+  not restricted based on filename.
 
     Examples:
 
@@ -781,12 +784,12 @@ not restricted based on filename.
         allow:
           - rule_type: scp
             allow_download: true
-            files:
+            paths:
               - /etc/group
               - /etc/passwd
           - rule_type: scp
             allow_upload: true
-            files: [/tmp/file1, /tmp/file2]
+            paths: [/tmp/file1, /tmp/file2]
 
 
 ## EXAMPLES
@@ -840,7 +843,7 @@ Note that this config can be spread around between the
         # Allow some specific file uploads
         - rule_type: scp
           allow_upload: true
-          files:
+          paths:
             - /srv/backups/host1.tgz
             - /srv/backups/host2.tgz
             - /srv/backups/host3.tgz
@@ -854,7 +857,7 @@ Note that this config can be spread around between the
         # but do not allow download
         - rule_type: rsync
           allow_upload: true
-          allow_recursion: true
+          allow_recursive: true
           allow_archive: true
           paths:
             - /tmp/foo

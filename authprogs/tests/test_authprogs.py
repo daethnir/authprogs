@@ -255,6 +255,54 @@ class AuthProgsTests(unittest.TestCase):
             {'command': ['/usr/bin/scp', '-d', '-t', '/etc/passwd']},
         )
 
+    def test_option_parsing_scp(self):
+        """Verify option parsing in SCP works."""
+        # Support with or without -- prior to file name
+        ap = getap('0.0.0.6', 'scp -f /etc/passwd')
+        self.assertEqual(
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '/etc/passwd']}
+        )
+        ap = getap('0.0.0.6', 'scp -f -- /etc/passwd')
+        self.assertEqual(
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '--', '/etc/passwd']}
+        )
+
+        # Bundling good here
+        ap = getap('0.0.0.6', 'scp -d -f /etc/passwd')
+        self.assertEqual(
+            ap.find_match(), {'command': ['/usr/bin/scp', '-d', '-f', '/etc/passwd']}
+        )
+        ap = getap('0.0.0.6', 'scp -df /etc/passwd')
+        self.assertEqual(
+            ap.find_match(), {'command': ['/usr/bin/scp', '-df', '/etc/passwd']}
+        )
+
+        # Bundling will not obscure out attempt to download
+        ap = getap('0.0.0.8', 'scp -d -f -- /etc/passwd')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+        ap = getap('0.0.0.8', 'scp -df /etc/passwd')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+        ap = getap('0.0.0.8', 'scp -df -- /etc/passwd')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+
+        # Similarly download + recursion
+        ap = getap('0.0.0.9', 'scp -f /etc/passwd')
+        self.assertEqual(
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '/etc/passwd']}
+        )
+        ap = getap('0.0.0.9', 'scp -f -d /etc/passwd')
+        self.assertEqual(
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '-d', '/etc/passwd']}
+        )
+        ap = getap('0.0.0.9', 'scp -f -r /etc/passwd')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+        ap = getap('0.0.0.9', 'scp -d -f -r /etc/passwd')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+        ap = getap('0.0.0.9', 'scp -fr /etc/passwd')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+        ap = getap('0.0.0.9', 'scp -drf /etc/passwd')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+
     def test_explicitly_allowed_scp(self):
         """Verify explicitly allowed SCP works."""
 
@@ -310,6 +358,37 @@ class AuthProgsTests(unittest.TestCase):
         self.assertRaises(authprogs.CommandRejected, ap.find_match)
 
         ap = getap('0.0.0.8', 'scp -d -t /etc/passwd')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+
+    def test_scp_s_rejected(self):
+        """Verify SCP rejects -S option"""
+        # run a command via -S
+        ap = getap('0.0.0.6', 'scp -t /etc/passwd')
+        self.assertEqual(
+            ap.find_match(),
+            {'command': ['/usr/bin/scp', '-t', '/etc/passwd']},
+        )
+
+        ap = getap('0.0.0.8', 'scp -t -S /path/to/a/program /etc/passwd')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+
+    def test_deprecated_recursion_scp(self):
+        """Verify we support the deprecated allow_recursion flag."""
+        ap = getap('0.0.0.7', 'scp -r -t -- /tmp')
+        self.assertEqual(
+            ap.find_match(),
+            {'command': ['/usr/bin/scp', '-r', '-t', '--', '/tmp']},
+        )
+        ap = getap('0.0.0.12', 'scp -r -t -- /tmp')
+        self.assertEqual(
+            ap.find_match(),
+            {'command': ['/usr/bin/scp', '-r', '-t', '--', '/tmp']},
+        )
+
+        # Incompatible allow_recurs(ion|ive) settings
+        ap = getap('0.0.0.13', 'scp -t -- /tmp')
+        self.assertRaises(authprogs.CommandRejected, ap.find_match)
+        ap = getap('0.0.0.14', 'scp -t -- /tmp')
         self.assertRaises(authprogs.CommandRejected, ap.find_match)
 
     def test_recursive_scp(self):
