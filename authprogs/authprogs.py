@@ -563,7 +563,7 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         command_info = {
             'from': self.get_client_ip(),
             'keyname': self.keyname,
-            'ssh_original_comand': self.original_command_string,
+            'ssh_original_command': self.original_command_string,
             'time': time.time(),
         }
 
