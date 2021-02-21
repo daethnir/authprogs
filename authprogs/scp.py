@@ -12,7 +12,7 @@ ALLOWED_SCP_BINARIES = ['/usr/bin/scp', '/usr/local/bin/scp']
 
 
 class ParserError(RuntimeError):
-    """Runtime rsync command line parser error."""
+    """Runtime scp command line parser error."""
 
     pass
 
@@ -59,7 +59,7 @@ class ScpValidator(object):
         return command
 
     def validate_command(self, command, rule):
-        """Determine if command matches the provided rsync rule.
+        """Determine if command matches the provided scp rule.
 
         Return None if not allowed.
         Return {'command': [command]} if acceptable.
