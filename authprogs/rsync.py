@@ -1,6 +1,5 @@
 from authprogs import authprogs
 import argparse
-import shutil
 import os
 import sys
 import glob
@@ -45,10 +44,6 @@ class RsyncValidator(object):
         self.boolarg_deny_default = {}
         self.boolarg_allow_default = {}
 
-        # Stores result of shutils.which
-        # key is program name, val is realpath.
-        self.which_cache = {}
-
     def validate_rsync_args(self, args):
         """Verify the rsync args are well formed.
 
@@ -86,8 +81,12 @@ class RsyncValidator(object):
         """Fix up the command before we process."""
 
         # Verify binary is valid and replace with realpath version
-        rsync_bin = self.valid_rsync_binary(command.pop(0))
+        requested_bin = command.pop(0)
+        rsync_bin = self.authprogs.valid_binary(requested_bin, ALLOWED_RSYNC_BINARIES)
         if not rsync_bin:
+            self.logdebug(
+                'skipping rsync processing, binary "{}"'
+                ' not in approved list\n'.format(requested_bin))
             return
         command.insert(0, rsync_bin)
         return True
@@ -96,46 +95,6 @@ class RsyncValidator(object):
         """Return paths of filename after doing rsync-like expansion."""
         paths = self.authprogs.globpaths(name, expanduser=True)
         return paths
-
-    def _whichbin(self, name):
-        """shutil.which wrapper for unit test mocking."""
-        return shutil.which(name)
-
-    def valid_rsync_binary(self, name):
-        """Validate and return the path of the rsync binary.
-
-        Returns path or False on error.
-        """
-
-        # Return from cache if set
-        if name in self.which_cache:
-            return self.which_cache[name]
-        else:
-            self.which_cache[name] = None
-
-        # If it's already one of the known binaries,
-        # return that
-        if name in ALLOWED_RSYNC_BINARIES:
-            return name
-
-        # Find it in our path
-        foundbin = self._whichbin(name)
-
-        if not foundbin:
-            return
-
-        # Convert to realpath, store, and return
-        foundbin = os.path.realpath(foundbin)
-        if foundbin not in ALLOWED_RSYNC_BINARIES:
-            self.logdebug(
-                'skipping rsync processing - binary "{}" '
-                'not in approved list.\n'.format(foundbin)
-            )
-            return
-
-        # Store this successful name in cache
-        self.which_cache[name] = foundbin
-        return foundbin
 
     def expand_rule(self, rule):
         """Expand rule options and return new rule.

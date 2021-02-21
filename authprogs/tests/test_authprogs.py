@@ -225,23 +225,23 @@ class AuthProgsTests(unittest.TestCase):
 
         ap = getap('0.0.0.6', 'scp -f -- /etc/passwd')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-f', '--', '/etc/passwd']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '--', '/etc/passwd']}
         )
 
         ap = getap('0.0.0.6', 'scp -d -t -- /etc/passwd')
         self.assertEqual(
             ap.find_match(),
-            {'command': ['scp', '-d', '-t', '--', '/etc/passwd']},
+            {'command': ['/usr/bin/scp', '-d', '-t', '--', '/etc/passwd']},
         )
 
         ap = getap('0.0.0.6', 'scp -f /etc/passwd')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-f', '/etc/passwd']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '/etc/passwd']}
         )
 
         ap = getap('0.0.0.6', 'scp -d -t /etc/passwd')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-d', '-t', '/etc/passwd']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-d', '-t', '/etc/passwd']}
         )
 
     def test_explicitly_allowed_scp(self):
@@ -250,23 +250,23 @@ class AuthProgsTests(unittest.TestCase):
         ap = getap('0.0.0.7', 'scp -d -f -- /etc/passwd')
         self.assertEqual(
             ap.find_match(),
-            {'command': ['scp', '-d', '-f', '--', '/etc/passwd']},
+            {'command': ['/usr/bin/scp', '-d', '-f', '--', '/etc/passwd']},
         )
 
         ap = getap('0.0.0.7', 'scp -d -t -- /etc/passwd')
         self.assertEqual(
             ap.find_match(),
-            {'command': ['scp', '-d', '-t', '--', '/etc/passwd']},
+            {'command': ['/usr/bin/scp', '-d', '-t', '--', '/etc/passwd']},
         )
 
         ap = getap('0.0.0.7', 'scp -d -f /etc/passwd')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-d', '-f', '/etc/passwd']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-d', '-f', '/etc/passwd']}
         )
 
         ap = getap('0.0.0.7', 'scp -d -t /etc/passwd')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-d', '-t', '/etc/passwd']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-d', '-t', '/etc/passwd']}
         )
 
     def test_unspecified_scp(self):
@@ -303,7 +303,7 @@ class AuthProgsTests(unittest.TestCase):
         """Verify recursive tests pass/fail as expected."""
         ap = getap('0.0.0.7', 'scp -r -t -- /tmp')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-r', '-t', '--', '/tmp']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-r', '-t', '--', '/tmp']}
         )
 
         ap = getap('0.0.0.9', 'scp -r -t -- /etc')
@@ -311,7 +311,7 @@ class AuthProgsTests(unittest.TestCase):
 
         ap = getap('0.0.0.7', 'scp -r -t /tmp')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-r', '-t', '/tmp']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-r', '-t', '/tmp']}
         )
 
         ap = getap('0.0.0.9', 'scp -r -t /etc')
@@ -323,7 +323,7 @@ class AuthProgsTests(unittest.TestCase):
         ap = getap('0.0.0.7', 'scp -p -r -t -- /tmp')
         self.assertEqual(
             ap.find_match(),
-            {'command': ['scp', '-p', '-r', '-t', '--', '/tmp']},
+            {'command': ['/usr/bin/scp', '-p', '-r', '-t', '--', '/tmp']},
         )
 
         ap = getap('0.0.0.9', 'scp -p -r -t -- /etc')
@@ -331,7 +331,7 @@ class AuthProgsTests(unittest.TestCase):
 
         ap = getap('0.0.0.7', 'scp -p -r -t /tmp')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-p', '-r', '-t', '/tmp']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-p', '-r', '-t', '/tmp']}
         )
 
         ap = getap('0.0.0.9', 'scp -p -r -t /etc')
@@ -418,20 +418,20 @@ class AuthProgsTests(unittest.TestCase):
         # Can download some files
         ap = getap('0.0.0.10', 'scp -f -- /etc/aliases')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-f', '--', '/etc/aliases']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '--', '/etc/aliases']}
         )
         ap = getap('0.0.0.10', 'scp -f -- /etc/passwd')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-f', '--', '/etc/passwd']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '--', '/etc/passwd']}
         )
 
         ap = getap('0.0.0.10', 'scp -f /etc/aliases')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-f', '/etc/aliases']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '/etc/aliases']}
         )
         ap = getap('0.0.0.10', 'scp -f /etc/passwd')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-f', '/etc/passwd']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '/etc/passwd']}
         )
 
         # Can't download this one
@@ -456,23 +456,23 @@ class AuthProgsTests(unittest.TestCase):
         # in alternate way
         ap = getap('1.0.0.10', 'scp -f -- /etc/group')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-f', '--', '/etc/group']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '--', '/etc/group']}
         )
         ap = getap('1.0.0.10', 'scp -f -- /etc/resolv.conf')
         self.assertEqual(
             ap.find_match(),
-            {'command': ['scp', '-f', '--', '/etc/resolv.conf']},
+            {'command': ['/usr/bin/scp', '-f', '--', '/etc/resolv.conf']},
         )
         ap = getap('1.0.0.10', 'scp -f -- /etc/foo/')
         self.assertRaises(authprogs.CommandRejected, ap.find_match)
 
         ap = getap('1.0.0.10', 'scp -f /etc/group')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-f', '/etc/group']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '/etc/group']}
         )
         ap = getap('1.0.0.10', 'scp -f /etc/resolv.conf')
         self.assertEqual(
-            ap.find_match(), {'command': ['scp', '-f', '/etc/resolv.conf']}
+            ap.find_match(), {'command': ['/usr/bin/scp', '-f', '/etc/resolv.conf']}
         )
         ap = getap('1.0.0.10', 'scp -f /etc/foo/')
         self.assertRaises(authprogs.CommandRejected, ap.find_match)

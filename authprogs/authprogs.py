@@ -31,6 +31,7 @@ import ipaddress
 import os
 import pprint
 import re
+import shutil
 import subprocess
 import sys
 import textwrap
@@ -119,6 +120,10 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
             self.logfh = open(logfile, 'a')
         else:
             self.logfh = False
+
+        # Stores result of shutils.which
+        # key is program name, val is realpath.
+        self.which_cache = {}
 
         if kwargs.get('authprogs_binary'):
             self.authprogs_binary = kwargs['authprogs_binary']
@@ -420,6 +425,39 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
         return self.subvalidators['rsync'].validate_command(
             self.original_command_list[:], rule
         )
+
+    def _whichbin(self, name):
+        """shutil.which wrapper for unit test mocking."""
+        return shutil.which(name)
+
+    def valid_binary(self, name, allowed):
+        """Determine if name is a valid binary in allowed.
+
+        Does realpath expansion and returns actual pathname.
+        """
+        # Return from cache if set and allowed
+        if name in self.which_cache:
+            if self.which_cache[name] in allowed:
+                return self.which_cache[name]
+            else:
+                return
+        else:
+            self.which_cache[name] = None
+
+        # Find it in our path
+        foundbin = self._whichbin(name)
+
+        if not foundbin:
+            return
+
+        # Convert to realpath, store, and return
+        foundbin = os.path.realpath(foundbin)
+        if foundbin not in allowed:
+            return
+
+        # Store this successful name in cache
+        self.which_cache[name] = foundbin
+        return foundbin
 
     def find_match_scp(self, rule):  # pylint: disable-msg=R0911,R0912
         """Handle scp commands."""

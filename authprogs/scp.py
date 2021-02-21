@@ -1,6 +1,5 @@
 from authprogs import authprogs
 import argparse
-import shutil
 import os
 import sys
 
@@ -42,31 +41,36 @@ class ScpValidator(object):
         self.log = authprogs.log
         self.parser = None
 
-    def validate_command(self, original_command_list, rule):
+    def fixup_command(self, command, rule):
+        """Fix up the command before we process."""
+
+        # Verify binary is valid and replace with realpath version
+        requested_bin = command.pop(0)
+        scp_bin = self.authprogs.valid_binary(requested_bin, ALLOWED_SCP_BINARIES)
+        if not scp_bin:
+            self.logdebug(
+                'skipping scp processing, binary "{}"'
+                ' not in approved list\n'.format(requested_bin))
+            return
+        command.insert(0, scp_bin)
+        return command
+
+    def validate_command(self, command, rule):
         """Determine if command matches the provided rsync rule.
 
         Return None if not allowed.
         Return {'command': [command]} if acceptable.
         """
+        orig_list = command[:]
 
-        # TODO: validate binary
-        #if not self.fixup_command(command, rule):
-        #    return
+        command = self.fixup_command(command, rule)
+        if not command:
+            return
 
         #orig_args = command[1:]
         #args = self.parse_args(orig_args)
 
-
-        orig_list = original_command_list[:]
         binary = orig_list.pop(0)
-        allowed_binaries = ['scp', '/usr/bin/scp']
-        if binary not in allowed_binaries:
-            self.logdebug(
-                'skipping scp processing - binary "{}" '
-                'not in approved list.\n'.format(binary)
-            )
-            return
-
         filepath = orig_list.pop()
         arguments = orig_list
 
@@ -102,4 +106,4 @@ class ScpValidator(object):
                 return
 
         # Allow it!
-        return {'command': original_command_list}
+        return {'command': command}

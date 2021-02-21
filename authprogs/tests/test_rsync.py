@@ -51,7 +51,7 @@ class RsyncTests(unittest.TestCase):
         """
         ap = getap(ip, resultstr)
         if skip_binary_check:
-            ap.subvalidators['rsync'].valid_rsync_binary = lambda *x: 'rsync'
+            ap.valid_binary = lambda *x: 'rsync'
         return ap
 
     def command_rejected(self, ip, result, apmutate=None):
@@ -130,16 +130,16 @@ class RsyncTests(unittest.TestCase):
 
         ap = self.getap('0.1.0.0', cmd)
         ap = self.getap('0.1.0.0', cmd, skip_binary_check=False)
-        ap.subvalidators['rsync']._whichbin = lambda x: None
+        ap._whichbin = lambda x: None
         self.assertRaises(authprogs.CommandRejected, ap.find_match)
 
         ap = self.getap('0.1.0.0', cmd, skip_binary_check=False)
-        ap.subvalidators['rsync']._whichbin = lambda x: '/home/wbagg/bin/rsync'
+        ap._whichbin = lambda x: '/home/wbagg/bin/rsync'
         self.assertRaises(authprogs.CommandRejected, ap.find_match)
 
         for allowed in rsync.ALLOWED_RSYNC_BINARIES:
             ap = getap('0.1.0.0', cmd)
-            ap.subvalidators['rsync']._whichbin = lambda x: allowed
+            ap._whichbin = lambda x: allowed
             self.assertEqual(
                 ap.find_match(),
                 {'command': [allowed, '--server', '-vv', '.', '/dst']},
