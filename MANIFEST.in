@@ -1,11 +1,16 @@
 include AUTHORS
+include AUTHORS.md
 include COPYING
 include DEVELOPMENT
 include DEVELOPMENT.md
 include INSTALL
+include INSTALL.md
 include README
+include README.md
 include README.rsync
+include README.rsync.md
 include TODO
+include TODO.md
 include doc/authprogs.1
 include doc/authprogs.html
 include doc/authprogs.md
