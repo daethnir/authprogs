@@ -9,6 +9,7 @@ args
 asciibetical
 authorized
 authprogs
+AuthprogsTests
 backticks
 behavior
 bri
@@ -35,6 +36,7 @@ dirlinks
 dirs
 distro
 Dotfiles
+egrep
 executability
 fifos
 foo
@@ -81,6 +83,7 @@ pty
 pubkey
 pubkeys
 py
+pypi
 realpath
 realpaths
 regex
@@ -91,13 +94,17 @@ rm
 ronn
 rsa
 rsh
+rst
 rsync
 rsync's
+RsyncTests
 rtomayko
 scp
+sdist
 setuptools
 shutils
 sockopts
+spelingerrers
 srv
 ssh
 sshd
@@ -111,6 +118,7 @@ sudo
 syslog
 tarball
 targetshouldbedirectory
+testpypi
 tgz
 tmp
 tmpfiles

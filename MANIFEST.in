@@ -1,5 +1,7 @@
 include AUTHORS
 include COPYING
+include DEVELOPMENT
+include DEVELOPMENT.md
 include INSTALL
 include README
 include README.rsync

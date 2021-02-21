@@ -22,7 +22,14 @@ if sys.version_info < (3, 3):
 
 # Documents that should be converted or renamed from markdown
 MARKDOWN2HTML = ['authprogs']
-MARKDOWN2TEXT = ['AUTHORS', 'INSTALL', 'README', 'README.rsync', 'TODO']
+MARKDOWN2TEXT = [
+    'AUTHORS',
+    'DEVELOPMENT',
+    'INSTALL',
+    'README',
+    'README.rsync',
+    'TODO',
+]
 
 console_script = 'authprogs'
 
@@ -154,6 +161,7 @@ setup(
             'share/doc/authprogs/',
             [
                 'AUTHORS',
+                'DEVELOPMENT',
                 'COPYING',
                 'INSTALL',
                 'README',

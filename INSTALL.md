@@ -39,30 +39,3 @@ or it may be available from your distro already, for example
 
 
 There should be no other dependencies.
-
-
-CONTRIBUTIONS
--------------
-
-If you wish to make changes to authprogs, send a pull request.
-Note that I plan to be very anal about unit testing; this is
-security-related software after all.
-
-Any code you provide will be assumed to be under the public
-domain unless specified otherwise.
-
-See the `TODO.md` file for ideas of things that need doing.
-
-
-REPORTING BUGS
-==============
-
-Please file bug reports at the [github issues page]
-
-
-
-[github issues page]: https://github.com/daethnir/authprogs/issues
-
-[github repository]: https://github.com/daethnir/authprogs
-
-[ronn]: https://github.com/rtomayko/ronn
