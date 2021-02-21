@@ -27,3 +27,6 @@ AUTHORS
 INSTALL
 README
 TODO
+
+# Local checkouts of third party code (e.g. rsync) for source perusal
+thirdparty/
