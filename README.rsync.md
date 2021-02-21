@@ -40,13 +40,13 @@ version has been negotiated.  When running over ssh, there
 is no version, so this always starts as `-e`.
 
 rsync then appends some pre-release protocol version and
-behavior flags information. These look like the single
+behaviour flags information. These look like the single
 letter options above but they are not. (For example the `C`
 in `-e.C` means that the client supports a checksum seed
 order fix, not that the `-C` (`--cvs-exclude`) flag is
 being sent.
 
-Authprogs currently recognizes the -e option and ignores
+Authprogs currently recognises the -e option and ignores
 its value.  For reference, as of rsync-3.1.2 this will
 typically be `-e.LsfxC`)
 

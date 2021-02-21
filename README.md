@@ -7,7 +7,7 @@ an ssh server and decides if the command requested by the
 ssh client should be run or rejected based on logic in the authprogs
 configuration file.
 
-Passwordless SSH using ssh identies or pubkeys can enable all
+Passwordless SSH using ssh identities or pubkeys can enable all
 sorts of wonderful automation, for example running unattended
 batch jobs, slurping down backups, or pushing out code.
 Unfortunately a key, once trusted, is allowed by default to run

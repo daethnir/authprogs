@@ -47,28 +47,28 @@ invocation of `authprogs` for the key or keys you wish to protect.
 
 A line of an unrestricted `authorized_key` entry might look like this:
 
-    ssh-rsa AAAAB3NzaC1yc2E.....OgQ7Pm1X8= user@example.com
+    ssh-rsa AAAAxxxxx...xxxxx user@example.com
 
 When setting up this key to use `authprogs`, you add a `command=` option
 to the very beginning of that line that points to the location where
 authprogs lives. For example if `authprogs` is in `/usr/bin/authprogs`,
 you would use this:
 
-    command="/usr/bin/authprogs --run" ssh-rsa AAAAB3NzaC1yc2E.....OgQ7Pm1X8= user@example.com
+    command="/usr/bin/authprogs --run" ssh-rsa AAAAxxxxx...xxxxx user@example.com
 
 You must include `--run` to let `authprogs` know it is running in SSH command mode.
 
 Authprogs has other command line options you may wish to include
 as well, for example
 
-    command="/usr/bin/authprogs --keyname=backups --run" ssh-rsa AAAA...Pm1X8= user@example.com
+    command="/usr/bin/authprogs --keyname=backups --run" ssh-rsa AAAA...xxxxx user@example.com
 
 Lastly, if you wish, ssh offers a number of other helpful
 restrictions you may wish to include that are separate from
 authprogs. These can be appended right after (or before) the
 command="" section if you wish.
 
-    command="/usr/bin/authprogs --run",no-port-forwarding,no-pty ssh-rsa AAAA..Pm1X8= user@example.com
+    command="/usr/bin/authprogs --run",no-port-forwarding,no-pty ssh-rsa AAAA...xxxxx user@example.com
 
 See the sshd(8) man page for more information about allowed
 `authorized_keys` configuration options.
@@ -90,7 +90,7 @@ For example the following
 would cause the following line to be added to your
 `~/.ssh/authorized_keys` file:
 
-    command="/usr/bin/authprogs --keyname backups --run",no-port-forwarding ssh-rsa AAAA..Pm1X8= user@example.com
+    command="/usr/bin/authprogs --keyname backups --run",no-port-forwarding ssh-rsa AAAA...xxxxx user@example.com
 
 ## RUN MODE OPTIONS
 
@@ -324,7 +324,7 @@ listed in the rule. (Spaces are squashed together.) If it matches,
 then the command is run.
 
 Note that the command must be *exactly* the same; `authprogs` is not
-aware of arguments supported by a command, so it cannot realize that
+aware of arguments supported by a command, so it cannot realise that
 `"ls -la"` and `"ls -a -l"` and `"ls -al"` and `"ls -l -a"` are all the
 same. You can list multiple commands to allow you to accept
 variants of a command if necessary.
@@ -941,7 +941,7 @@ as they are checked, etc.
 ## HISTORY
 
 A perl version of `authprogs` was originally published
-at http://www.hackinglinuxexposed.com/articles/20030115.html
+at https://www.hackinglinuxexposed.com/articles/20030115.html
 in 2003. This is a complete rewrite in python, with a more
 extensible configuration, and avoiding some of the limitations
 of the former.
