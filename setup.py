@@ -140,7 +140,7 @@ setup(
     version=authprogs.__version__,
     description='SSH Command Authenticator',
     long_description=long_description(),
-    keywords='authprogs ssh pubkey identity authoried_keys security',
+    keywords='authprogs ssh pubkey identity authorized_keys security',
     url='http://github.com/daethnir/authprogs',
     author='Bri Hatch',
     author_email='bri@ifokr.org',
