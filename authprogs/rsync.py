@@ -82,11 +82,14 @@ class RsyncValidator(object):
 
         # Verify binary is valid and replace with realpath version
         requested_bin = command.pop(0)
-        rsync_bin = self.authprogs.valid_binary(requested_bin, ALLOWED_RSYNC_BINARIES)
+        rsync_bin = self.authprogs.valid_binary(
+            requested_bin, ALLOWED_RSYNC_BINARIES
+        )
         if not rsync_bin:
             self.logdebug(
                 'skipping rsync processing, binary "{}"'
-                ' not in approved list\n'.format(requested_bin))
+                ' not in approved list\n'.format(requested_bin)
+            )
             return
         command.insert(0, rsync_bin)
         return True

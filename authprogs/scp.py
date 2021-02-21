@@ -46,11 +46,14 @@ class ScpValidator(object):
 
         # Verify binary is valid and replace with realpath version
         requested_bin = command.pop(0)
-        scp_bin = self.authprogs.valid_binary(requested_bin, ALLOWED_SCP_BINARIES)
+        scp_bin = self.authprogs.valid_binary(
+            requested_bin, ALLOWED_SCP_BINARIES
+        )
         if not scp_bin:
             self.logdebug(
                 'skipping scp processing, binary "{}"'
-                ' not in approved list\n'.format(requested_bin))
+                ' not in approved list\n'.format(requested_bin)
+            )
             return
         command.insert(0, scp_bin)
         return command
@@ -67,8 +70,8 @@ class ScpValidator(object):
         if not command:
             return
 
-        #orig_args = command[1:]
-        #args = self.parse_args(orig_args)
+        # orig_args = command[1:]
+        # args = self.parse_args(orig_args)
 
         binary = orig_list.pop(0)
         filepath = orig_list.pop()
