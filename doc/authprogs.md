@@ -428,7 +428,7 @@ ssh server. Defaults to false.
 
   WARNING: specifying a directory in `paths` would allow rsync to
   act on any files therein at potentially infinite depth, e.g. when
-  `allow_recursion` is set, or the client uses `--files-from`. If you
+  `allow_recursive` is set, or the client uses `--files-from`. If you
   want to restrict to specific files you must name them explicitly.
 
   See RSYNC SYMLINK SUPPORT for potential limitations to `paths`.
