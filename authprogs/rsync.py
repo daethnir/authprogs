@@ -306,7 +306,7 @@ class RsyncValidator(object):
     def parse_args(self, args):
         """Parse rsync args."""
 
-        self.parser = ArgumentParserWrapper()
+        self.parser = ArgumentParserWrapper(add_help=False)
 
         self.boolarg('--server')
         self.boolarg('--sender')
