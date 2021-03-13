@@ -670,8 +670,17 @@ def main():  # pylint: disable-msg=R0912,R0915
         '--install_key. Defaults to ~/.ssh/authorized_keys',
         metavar='FILE',
     )
+    group.add_argument(
+        '--version', action='store_true', help='Show version and exit.'
+    )
 
     args = parser.parse_args()
+
+    if args.version:
+        from . import __version__
+
+        print(__version__)
+        sys.exit()
 
     if not args.configfile:
         cfg = os.path.expanduser('~/.ssh/authprogs.yaml')

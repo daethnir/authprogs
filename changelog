@@ -1,3 +1,8 @@
+authprogs (0.7.4) testing; urgency=low
+    * Add --version option
+
+ -- Bri Hatch <bri@ifokr.org>  Fri, 12 Mar 2021 19:00:00 -0800
+
 authprogs (0.7.3) testing; urgency=low
     * Update documentation, spell check, and other non-functional changes
 
