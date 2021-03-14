@@ -367,10 +367,20 @@ class AuthProgs(object):  # pylint: disable-msg=R0902
     def dump_config(self):
         """Pretty print the configuration dict to stdout."""
         yaml_content = self.get_merged_config()
+        print(
+            'Configuration Source:\n\t{}\n'.format(
+                yaml_content.read().replace('\n', '\n\t')
+            )
+        )
         yaml_content.close()
 
         try:
             self.load()
+            print(
+                'Effective Configuration\n\t{}\n'.format(
+                    pretty(self.yamldocs).replace('\n', '\n\t')
+                )
+            )
         except ConfigError:
             sys.stderr.write(
                 'config parse error. try running with --logfile=/dev/tty\n'
